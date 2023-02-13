@@ -18,6 +18,7 @@ deploy/*
 */.settings/
 */bin/
 
+/gradle
 gradlew
 gradlew.bat
 
