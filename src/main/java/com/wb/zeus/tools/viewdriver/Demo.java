@@ -83,8 +83,6 @@ public class Demo {
     }
 
     public static void main(String[] args) throws Exception {
-
-
         List<Long> ids = new ArrayList<>();
         ids.add(1L);
         List<ViewA> viewAList = defViewDriver.mapView(ids, ViewA.class, null);
