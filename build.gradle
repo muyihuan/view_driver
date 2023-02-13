@@ -1,0 +1,23 @@
+plugins {
+    id 'java'
+    id 'maven'
+}
+
+apply plugin: 'java'
+apply plugin: 'maven'
+
+group 'com.wb.view-driver'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    annotationProcessor('org.projectlombok:lombok:1.18.10')
+    compileOnly('org.projectlombok:lombok:1.18.10')
+    testAnnotationProcessor('org.projectlombok:lombok:1.18.10')
+    testImplementation('org.projectlombok:lombok:1.18.10')
+
+    // ...
+}
