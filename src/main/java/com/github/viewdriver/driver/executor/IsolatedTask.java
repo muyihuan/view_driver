@@ -1,16 +1,16 @@
 package com.github.viewdriver.driver.executor;
 
 /**
- * 视图处理任务.
+ * 隔离型任务.
  *
  * @author yanghuan
  */
-public interface ViewTask extends Runnable {
+public interface IsolatedTask extends Runnable {
 
     /**
-     * 获取任务负责的视图
+     * 获取隔离ID
      *
      * @return 视图
      */
-    Class<?> getView();
+    int getTransactionId();
 }

@@ -55,15 +55,16 @@ public class DefViewDriver implements ViewDriver {
             this.driverMeta.check();
         }
 
+        // 创建执行器
         if(this.executor == null) {
             if(this.config == null || this.config.executorConfig == null) {
-                this.executor = new ConfusedExecutor("view_driver_executor", null);
+                this.executor = new ConfusedExecutor("view-driver-executor", null);
             }
             else if(this.config.executorConfig.getGroupCount() < 1) {
-                this.executor = new ConfusedExecutor("view_driver_executor", this.config.executorConfig);
+                this.executor = new ConfusedExecutor("view-driver-executor", this.config.executorConfig);
             }
             else {
-                this.executor = new IsolatedExecutor("view_driver_executor", this.config.executorConfig);
+                this.executor = new IsolatedExecutor("view-driver-executor", this.config.executorConfig);
             }
         }
     }

@@ -20,6 +20,8 @@ public class IsolatedExecutor implements Executor {
 
     private List<ConfusedExecutor> threadPoolExecutorList = new ArrayList<>();
 
+    private final int groupCount;
+
     /**
      * Create a new instance
      *
@@ -28,26 +30,30 @@ public class IsolatedExecutor implements Executor {
      */
     public IsolatedExecutor(String threadName, Config.ExecutorConfig config) {
         if(config == null || config.getGroupCount() < 1) {
-            throw new ParamIsNullException("分组数量 < 1，请检查相关配置!");
+            throw new ParamIsNullException("分组数量 < 1，(expected: > 1)");
         }
 
-        int groupCount = config.getGroupCount();
+        groupCount = config.getGroupCount();
         for(int i = 0; i < groupCount; i ++) {
-            threadPoolExecutorList.add(new ConfusedExecutor(threadName, config));
+            threadPoolExecutorList.add(new ConfusedExecutor(threadName + "-" + i, config));
         }
 
         if(logger.isDebugEnabled()) {
-            logger.info("分组隔离执行器创建完成 groupCount=" + groupCount);
+            logger.debug("分组隔离执行器创建完成 groupCount=" + groupCount);
         }
     }
 
     @Override
     public void execute(Runnable task) {
-        if(task instanceof ViewTask) {
-
+        int id = 0;
+        if(task instanceof IsolatedTask) {
+            id = ((IsolatedTask) task).getTransactionId() % groupCount;
         }
-        else {
 
+        threadPoolExecutorList.get(id).execute(task);
+
+        if(logger.isDebugEnabled()) {
+            logger.debug("分组隔离执行器-任务执行完成 id=" + id);
         }
     }
 }

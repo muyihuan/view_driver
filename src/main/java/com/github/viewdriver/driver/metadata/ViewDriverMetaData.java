@@ -189,7 +189,7 @@ public class ViewDriverMetaData implements ModelAndView {
 
 
     /**
-     * 两个model.
+     * 两个model组合.
      *
      * @author yanghuan
      */
@@ -234,7 +234,7 @@ public class ViewDriverMetaData implements ModelAndView {
     }
 
     /**
-     * view加getter方法组合.
+     * view+getter组合.
      *
      * @author yanghuan
      */
@@ -279,7 +279,7 @@ public class ViewDriverMetaData implements ModelAndView {
     }
 
     /**
-     * model加getter方法组合.
+     * model+getter组合.
      *
      * @author yanghuan
      */
@@ -324,7 +324,7 @@ public class ViewDriverMetaData implements ModelAndView {
     }
 
     /**
-     * model加getter方法加指定属性组合.
+     * model+getter+指定属性组合.
      *
      * @author yanghuan
      */

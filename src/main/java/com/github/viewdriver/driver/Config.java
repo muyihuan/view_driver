@@ -19,7 +19,7 @@ public class Config {
     /**
      * 驱动器相关配置.
      */
-    Object driverConfig;
+    DriverConfig driverConfig;
 
     /**
      * 执行器相关配置
@@ -56,5 +56,19 @@ public class Config {
          * 任务队列长度
          */
         private int queueSize;
+    }
+
+    /**
+     * 驱动器相关配置
+     *
+     * @author yanghuan
+     */
+    @Data
+    public static class DriverConfig {
+
+        /**
+         * 驱动超时时间(ms)
+         */
+        private long timeout;
     }
 }
