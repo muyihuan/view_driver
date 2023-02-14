@@ -6,11 +6,12 @@ plugins {
 apply plugin: 'java'
 apply plugin: 'maven'
 
-group 'com.wb.view-driver'
+group 'com.github.muyi.view-driver'
 version '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
+    mavenLocal()
 }
 
 dependencies {
