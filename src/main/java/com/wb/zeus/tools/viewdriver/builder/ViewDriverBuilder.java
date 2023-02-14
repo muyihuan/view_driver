@@ -187,9 +187,6 @@ public class ViewDriverBuilder {
      * @return ViewDriver
      */
     public ViewDriver build() {
-        // 对注册的数据进行校验，校验失败会抛异常.
-        driverMetaData.check();
-
         return new DefViewDriver(driverMetaData, config);
     }
 }

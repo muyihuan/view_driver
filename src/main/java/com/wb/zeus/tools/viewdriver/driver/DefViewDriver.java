@@ -48,6 +48,11 @@ public class DefViewDriver implements ViewDriver {
         this.config = config;
         this.executor = executor;
         this.viewParser = viewTreeParser;
+
+        // 对注册的数据进行校验，校验失败会抛异常.
+        if(this.driverMeta != null) {
+            this.driverMeta.check();
+        }
     }
 
     @Override
