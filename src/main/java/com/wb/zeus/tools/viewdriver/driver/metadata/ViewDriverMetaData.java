@@ -129,10 +129,29 @@ public class ViewDriverMetaData implements ModelAndView {
 
     /**
      * 对注册的数据进行校验，校验失败会抛异常，及时终止进行的流程.
-     * 1.
+     * 1.注册的 view 和 model 不可以为空!
+     * 2.注册的 model 关系不可以为空!
+     * 3.注册的 model 加载器不可以为空!
+     * 4.注册的 非model 加载器不完整!
+     * 5.view 和 model 使用错误，请检查配置!
+     * 6. ...
      */
     public void check() {
+        if(view_bind_model.isEmpty()) {
+            throw new RuntimeException("注册的 view 和 model 不可以为空!");
+        }
 
+        if(model_id_getter.isEmpty()) {
+            throw new RuntimeException("注册的 model 关系不可以为空!");
+        }
+
+        if(model_loader_by_id.isEmpty()) {
+            throw new RuntimeException("注册的 model 加载器不可以为空!");
+        }
+
+        if(non_model_id_getter.size() != non_model_loader.size()) {
+            throw new RuntimeException("注册的 非model 加载器不完整!");
+        }
     }
 
 
