@@ -1,4 +1,4 @@
-package com.wb.zeus.tools.viewdriver.builder.lambda;
+package com.wb.zeus.tools.viewdriver.lambda;
 
 import lombok.SneakyThrows;
 

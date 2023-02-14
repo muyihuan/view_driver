@@ -1,6 +1,6 @@
 package com.wb.zeus.tools.viewdriver.driver.metadata;
 
-import com.wb.zeus.tools.viewdriver.builder.lambda.FieldGetter;
+import com.wb.zeus.tools.viewdriver.lambda.FieldGetter;
 import com.wb.zeus.tools.viewdriver.driver.exception.ParamIsNullException;
 
 import java.util.HashMap;

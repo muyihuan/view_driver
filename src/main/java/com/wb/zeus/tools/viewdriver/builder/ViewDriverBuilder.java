@@ -2,7 +2,7 @@ package com.wb.zeus.tools.viewdriver.builder;
 
 import com.wb.zeus.tools.viewdriver.Context;
 import com.wb.zeus.tools.viewdriver.ViewDriver;
-import com.wb.zeus.tools.viewdriver.builder.lambda.FieldGetter;
+import com.wb.zeus.tools.viewdriver.lambda.FieldGetter;
 import com.wb.zeus.tools.viewdriver.driver.Config;
 import com.wb.zeus.tools.viewdriver.driver.DefViewDriver;
 import com.wb.zeus.tools.viewdriver.driver.metadata.ViewDriverMetaData;

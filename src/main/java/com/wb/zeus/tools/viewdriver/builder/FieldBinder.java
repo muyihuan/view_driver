@@ -1,6 +1,6 @@
 package com.wb.zeus.tools.viewdriver.builder;
 
-import com.wb.zeus.tools.viewdriver.builder.lambda.FieldGetter;
+import com.wb.zeus.tools.viewdriver.lambda.FieldGetter;
 
 import java.util.HashMap;
 import java.util.Map;

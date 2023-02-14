@@ -32,7 +32,7 @@ public class DefViewDriver implements ViewDriver {
      * @param config 视图驱动相关配置.
      */
     public DefViewDriver(ViewDriverMetaData driverMeta, Config config) {
-        this(driverMeta, config, new MultiThreadExecutor("view_driver_executor", config));
+        this(driverMeta, config, new MultiThreadExecutor("view_driver_executor", config), new ViewTreeParser());
     }
 
     /**
@@ -41,13 +41,13 @@ public class DefViewDriver implements ViewDriver {
      * @param driverMeta 视图驱动元数据.
      * @param config 视图驱动相关配置.
      * @param executor 任务执行器.
+     * @param viewTreeParser 视图解析器.
      */
-    public DefViewDriver(ViewDriverMetaData driverMeta, Config config, Executor executor) {
+    public DefViewDriver(ViewDriverMetaData driverMeta, Config config, Executor executor, ViewTreeParser viewTreeParser) {
         this.driverMeta = driverMeta;
         this.config = config;
         this.executor = executor;
-        // 视图解析器
-        this.viewParser = new ViewTreeParser();
+        this.viewParser = viewTreeParser;
     }
 
     @Override
