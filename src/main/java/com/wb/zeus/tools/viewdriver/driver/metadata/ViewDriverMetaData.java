@@ -136,6 +136,7 @@ public class ViewDriverMetaData implements ModelAndView {
      * 5.view 和 model 使用错误，请检查配置!
      * 6. ...
      */
+    @Override
     public void check() {
         if(view_bind_model.isEmpty()) {
             throw new RuntimeException("注册的 view 和 model 不可以为空!");

@@ -8,7 +8,7 @@ import java.lang.reflect.Method;
 import java.util.function.Function;
 
 /**
- * getter方法的lambda表达式.
+ * getter方法的lambda表达式，可以获取表达式对应的类、方法、属性等.
  *
  * @author yanghuan
  */

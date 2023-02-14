@@ -183,7 +183,7 @@ public class ViewDriverBuilder {
     }
 
     /**
-     * 通过以上配置生成View驱动器.
+     * 构建View驱动器.
      * @return ViewDriver
      */
     public ViewDriver build() {

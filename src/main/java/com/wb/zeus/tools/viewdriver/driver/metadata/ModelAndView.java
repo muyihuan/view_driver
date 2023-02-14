@@ -8,4 +8,8 @@ package com.wb.zeus.tools.viewdriver.driver.metadata;
  */
 public interface ModelAndView {
 
+    /**
+     * 对元数据进行校验，校验失败会抛异常，及时终止进行的流程.
+     */
+    void check();
 }
