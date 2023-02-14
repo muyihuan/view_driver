@@ -144,10 +144,20 @@ public class ViewDriverBuilder {
      * @param valueLoader 数据加载器.
      * @param <V> View.
      * @param <M> View绑定的Model.
-     * @param <O> 属性类型.
+     * @param <A> View的属性类型.
+     * @param <I> 加载的ID类型.
      * @return ViewDriverBuilder
      */
-    public <V, M, O, A> ViewDriverBuilder nonModelLoader(FieldGetter<V, A> viewAttribute, FieldGetter<M, O> idGetter, BiFunction<List<O>, Context, Map<O, A>> valueLoader) {
+    public <V, M, A, I> ViewDriverBuilder nonModelLoader(FieldGetter<V, A> viewAttribute, FieldGetter<M, I> idGetter, BiFunction<List<I>, Context, Map<I, A>> valueLoader) {
+        try {
+            ViewDriverMetaData.ViewAndGetter viewAndGetter = new ViewDriverMetaData.ViewAndGetter(Class.forName(viewAttribute.getClassName()), viewAttribute.getMethodName());
+            driverMetaData.non_model_id_getter.put(viewAndGetter, idGetter);
+            driverMetaData.non_model_loader.put(viewAndGetter, valueLoader);
+        }
+        catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
         return this;
     }
 
@@ -177,6 +187,9 @@ public class ViewDriverBuilder {
      * @return ViewDriver
      */
     public ViewDriver build() {
+        // 对注册的数据进行校验，校验失败会抛异常.
+        driverMetaData.check();
+
         return new DefViewDriver(driverMetaData, config);
     }
 }

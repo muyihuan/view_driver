@@ -21,7 +21,7 @@ import java.util.function.Function;
 public class ViewDriverMetaData implements ModelAndView {
 
     /**
-     * view和model绑定关系.
+     * 设置view和model绑定关系.
      *
      * 例如：
      *   view1绑定model1: view1 <=> model1
@@ -32,7 +32,7 @@ public class ViewDriverMetaData implements ModelAndView {
     public final Map<Class<?>, Class<?>> view_bind_model = new HashMap<>();
 
     /**
-     * view的属性值如何从绑定的model中获取.
+     * 设置view的属性值如何从绑定的model中获取.
      *
      * 例如：
      *    view1的属性a是通过model1的属性a转换后获取的.
@@ -47,7 +47,7 @@ public class ViewDriverMetaData implements ModelAndView {
     public final Map<ViewAndGetter, Function> field_decorator = new HashMap<>();
 
     /**
-     * model之间的关联关系.
+     * 设置model之间的关联关系.
      *
      * 例如：
      *    model1中有主键id为aId、外键id有bId，bId对应的是model2的主键id.
@@ -63,7 +63,7 @@ public class ViewDriverMetaData implements ModelAndView {
     public final Map<TwoModel, FieldGetter> model_relation_by_outer_id = new HashMap<>();
 
     /**
-     * 通过model的主键id加载model的model加载器.
+     * 设置通过model的主键id加载model的加载器.
      *
      * 例如：
      *    model1中有主键id为id，通过id以getModel1ById方法查询对应model1.
@@ -75,7 +75,7 @@ public class ViewDriverMetaData implements ModelAndView {
     public final Map<Class<?>, BiFunction> model_loader_by_id = new HashMap<>();
 
     /**
-     * 通过外键id加载model的model加载器.
+     * 设置通过外键id加载model的加载器.
      *
      * 例如：
      *    model1中有外键id有bId，bId对应的是model2的主键id，可以通过bId和getModel1ListBybId方法查询所有对应的model1集合.
@@ -87,18 +87,33 @@ public class ViewDriverMetaData implements ModelAndView {
     public final Map<ModelAndGetter, BiFunction> model_loader_by_outer_id = new HashMap<>();
 
     /**
-     * 通过外键id加载model的model加载器，当一个View内存在多个属性的类型是同一个View类型并且model加载的方式不同.
+     * 设置通过外键id加载model的加载器，当一个View内存在多个属性的类型是同一个View类型并且model加载的方式不同.
      *
      * 例如：
      *    model1中有外键id有bId和cId，bId和cId对应的都是model2的主键id，分别可以通过getModel1ListBybId和getModel1ListBycId方法查询所有对应的model1集合.
      *                                          |
      *                                         V
-     *                     model1.class + bId <=> getModel1ListBybId
+     *               情况1: model1.class + bId <=> getModel1ListBybId
      *
-     *                     model1.class + bId <=> getModel1ListBycId
+     *               情况2: model1.class + bId <=> getModel1ListBycId
      *
      */
     public final Map<ModelAndGetterAndField, BiFunction> model_loader_by_outer_id_bind_field = new HashMap<>();
+
+    /**
+     * 设置View内未知类型(非View、未绑定Model的属性)的数据加载器.
+     *
+     * 例如：
+     *    View1中有属性x，其数据类型为xObject，xObject的数据通过Model1的id以getXObject方法进行查询.
+     *                                           |
+     *                                          V
+     *    non_model_id_getter: view1.class + x <=> model1::getId
+     *
+     *    non_model_loader: view1.class + x <=> getXObject
+     *
+     */
+    public final Map<ViewAndGetter, FieldGetter> non_model_id_getter = new HashMap<>();
+    public final Map<ViewAndGetter, BiFunction> non_model_loader = new HashMap<>();
 
     /**
      * model过滤器.
@@ -111,6 +126,47 @@ public class ViewDriverMetaData implements ModelAndView {
      *
      */
     public final Map<Class<?>, BiFunction> model_filter = new HashMap<>();
+
+    /**
+     * 对注册的数据进行校验，校验失败会抛异常，及时终止进行的流程.
+     * 1.
+     */
+    public void check() {
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * 两个model.
