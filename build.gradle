@@ -17,8 +17,20 @@ repositories {
 dependencies {
     annotationProcessor('org.projectlombok:lombok:1.18.10')
     compileOnly('org.projectlombok:lombok:1.18.10')
-    testAnnotationProcessor('org.projectlombok:lombok:1.18.10')
-    testImplementation('org.projectlombok:lombok:1.18.10')
+    implementation('org.slf4j:slf4j-api:1.7.26')
+    implementation('ch.qos.logback:logback-classic:1.1.8')
+
 
     // ...
+
+
+    // 单元测试
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.10'
+    testImplementation 'org.projectlombok:lombok:1.18.10'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.1'
+}
+
+test {
+    useJUnitPlatform()
 }
