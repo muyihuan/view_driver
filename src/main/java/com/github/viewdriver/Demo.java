@@ -13,10 +13,10 @@ import com.github.case2.domain.modele.model.ModelE;
 import com.github.case2.domain.modelf.ModelFDomainService;
 import com.github.case2.domain.modelf.model.ModelF;
 import com.github.case2.view.*;
-import com.github.viewdriver.driver.Config;
 import com.github.viewdriver.builder.FieldBinder;
 import com.github.viewdriver.builder.IdBinder;
 import com.github.viewdriver.builder.ViewDriverBuilder;
+import com.github.viewdriver.driver.Config;
 
 import java.util.ArrayList;
 import java.util.Collections;

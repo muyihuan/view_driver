@@ -1,12 +1,13 @@
 package com.github.viewdriver.driver;
 
-import com.github.viewdriver.ViewDriver;
 import com.github.viewdriver.Context;
-import com.github.viewdriver.driver.executor.MultiThreadExecutor;
+import com.github.viewdriver.ViewDriver;
+import com.github.viewdriver.driver.exception.MetaDataIsNullException;
+import com.github.viewdriver.driver.executor.ConfusedExecutor;
+import com.github.viewdriver.driver.executor.IsolatedExecutor;
 import com.github.viewdriver.driver.metadata.ViewDriverMetaData;
 import com.github.viewdriver.driver.tree.ViewTree;
 import com.github.viewdriver.driver.tree.ViewTreeNode;
-import com.github.viewdriver.driver.exception.MetaDataIsNullException;
 import com.github.viewdriver.driver.tree.ViewTreeParser;
 
 import java.util.*;
@@ -21,9 +22,9 @@ import java.util.function.Function;
 public class DefViewDriver implements ViewDriver {
 
     private final ViewDriverMetaData driverMeta;
-    private final Config config;
-    private final Executor executor;
     private final ViewTreeParser viewParser;
+    private Config config;
+    private Executor executor;
 
     /**
      * Create a new instance
@@ -32,7 +33,7 @@ public class DefViewDriver implements ViewDriver {
      * @param config 视图驱动相关配置.
      */
     public DefViewDriver(ViewDriverMetaData driverMeta, Config config) {
-        this(driverMeta, config, new MultiThreadExecutor("view_driver_executor", config), new ViewTreeParser());
+        this(driverMeta, config, null, new ViewTreeParser());
     }
 
     /**
@@ -52,6 +53,18 @@ public class DefViewDriver implements ViewDriver {
         // 对注册的数据进行校验，校验失败会抛异常.
         if(this.driverMeta != null) {
             this.driverMeta.check();
+        }
+
+        if(this.executor == null) {
+            if(this.config == null || this.config.executorConfig == null) {
+                this.executor = new ConfusedExecutor("view_driver_executor", null);
+            }
+            else if(this.config.executorConfig.getGroupCount() < 1) {
+                this.executor = new ConfusedExecutor("view_driver_executor", this.config.executorConfig);
+            }
+            else {
+                this.executor = new IsolatedExecutor("view_driver_executor", this.config.executorConfig);
+            }
         }
     }
 

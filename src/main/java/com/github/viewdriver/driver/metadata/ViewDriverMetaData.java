@@ -1,7 +1,7 @@
 package com.github.viewdriver.driver.metadata;
 
-import com.github.viewdriver.lambda.FieldGetter;
 import com.github.viewdriver.driver.exception.ParamIsNullException;
+import com.github.viewdriver.lambda.FieldGetter;
 
 import java.util.HashMap;
 import java.util.Map;
