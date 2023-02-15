@@ -11,13 +11,13 @@ import java.util.concurrent.*;
  */
 public class ConfusedExecutor implements Executor {
 
-    private ThreadPoolExecutor executor = null;
+    private final ThreadPoolExecutor executor;
 
     /**
-     * Create a new instance
+     * Create a new instance.
      *
-     * @param threadName 线程名称
-     * @param config 执行器相关配置
+     * @param threadName 线程名称.
+     * @param config 执行器相关配置.
      */
     public ConfusedExecutor(String threadName, Config.ExecutorConfig config) {
         int coreThreadCount = 2;
@@ -25,12 +25,12 @@ public class ConfusedExecutor implements Executor {
             coreThreadCount = config.getCoreThreadCount();
         }
 
-        int maxThreadCount = 2;
-        if(config != null && config.getMaxThreadCount() > coreThreadCount) {
+        int maxThreadCount = 4;
+        if(config != null && config.getMaxThreadCount() >= coreThreadCount) {
             maxThreadCount = config.getCoreThreadCount();
         }
 
-        int keepAliveTimeSeconds = 300;
+        int keepAliveTimeSeconds = 120;
         if(config != null && config.getKeepAliveTimeSeconds() > 0) {
             keepAliveTimeSeconds = config.getKeepAliveTimeSeconds();
         }
@@ -40,12 +40,14 @@ public class ConfusedExecutor implements Executor {
             queueSize = config.getQueueSize();
         }
 
-        executor = new ThreadPoolExecutor(coreThreadCount, maxThreadCount, keepAliveTimeSeconds, TimeUnit.SECONDS, new LinkedBlockingQueue<>(queueSize), new ThreadFactory() {
-            @Override
-            public Thread newThread(Runnable r) {
-                return new Thread(r, (threadName == null || "".equals(threadName)) ? "view-driver-simple-executor" : threadName);
-            }
-        });
+        executor = new ThreadPoolExecutor(
+                coreThreadCount,
+                maxThreadCount,
+                keepAliveTimeSeconds,
+                TimeUnit.SECONDS,
+                new LinkedBlockingQueue<>(queueSize),
+                r -> new Thread(r, (threadName == null || "".equals(threadName)) ? "vd-confused-executor" : threadName),
+                new ThreadPoolExecutor.DiscardPolicy());
     }
 
     @Override

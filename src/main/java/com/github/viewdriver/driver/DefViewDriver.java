@@ -27,7 +27,7 @@ public class DefViewDriver implements ViewDriver {
     private Executor executor;
 
     /**
-     * Create a new instance
+     * Create a new instance.
      *
      * @param driverMeta 视图驱动元数据.
      * @param config 视图驱动相关配置.
@@ -37,7 +37,7 @@ public class DefViewDriver implements ViewDriver {
     }
 
     /**
-     * Create a new instance
+     * Create a new instance.
      *
      * @param driverMeta 视图驱动元数据.
      * @param config 视图驱动相关配置.
@@ -55,7 +55,7 @@ public class DefViewDriver implements ViewDriver {
             this.driverMeta.check();
         }
 
-        // 创建执行器
+        // 创建执行器.
         if(this.executor == null) {
             if(this.config == null || this.config.executorConfig == null) {
                 this.executor = new ConfusedExecutor("view-driver-executor", null);

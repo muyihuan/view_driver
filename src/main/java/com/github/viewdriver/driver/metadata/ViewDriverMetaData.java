@@ -1,7 +1,10 @@
 package com.github.viewdriver.driver.metadata;
 
 import com.github.viewdriver.driver.exception.ParamIsNullException;
+import com.github.viewdriver.driver.executor.IsolatedExecutor;
 import com.github.viewdriver.lambda.FieldGetter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +22,8 @@ import java.util.function.Function;
  * @author yanghuan
  */
 public class ViewDriverMetaData implements ModelAndView {
+
+    private final Logger logger = LoggerFactory.getLogger(IsolatedExecutor.class);
 
     /**
      * 设置view和model绑定关系.
@@ -134,7 +139,8 @@ public class ViewDriverMetaData implements ModelAndView {
      * 3.注册的 model 加载器不可以为空!
      * 4.注册的 非model 加载器不完整!
      * 5.view 和 model 使用错误，请检查配置!
-     * 6. ...
+     * 6.注册的 model 没有设置加载器!
+     * 7. ...
      */
     @Override
     public void check() {
@@ -153,6 +159,14 @@ public class ViewDriverMetaData implements ModelAndView {
         if(non_model_id_getter.size() != non_model_loader.size()) {
             throw new RuntimeException("注册的 非model 加载器不完整!");
         }
+
+        view_bind_model.values().forEach(model -> {
+            if(model_id_getter.get(model) == null) {
+                logger.info("元数据校验 => 注册的 model 没有设置加载器! model=" + model.getName());
+            }
+        });
+
+        // 更精细的校验.
     }
 
 

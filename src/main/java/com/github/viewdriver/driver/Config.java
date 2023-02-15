@@ -53,9 +53,11 @@ public class Config {
         private int keepAliveTimeSeconds;
 
         /**
-         * 任务队列长度
+         * 任务队列长度，如果任务时效性很短的就没必要设置的很长，设置的越长堆积的时候影响越大.
          */
         private int queueSize;
+
+        // 拒绝策略默认丢弃并打印日志.
     }
 
     /**

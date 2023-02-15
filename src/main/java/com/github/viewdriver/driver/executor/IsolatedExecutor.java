@@ -18,15 +18,15 @@ public class IsolatedExecutor implements Executor {
 
     private final Logger logger = LoggerFactory.getLogger(IsolatedExecutor.class);
 
-    private List<ConfusedExecutor> threadPoolExecutorList = new ArrayList<>();
+    private final List<ConfusedExecutor> threadPoolExecutorList = new ArrayList<>();
 
     private final int groupCount;
 
     /**
-     * Create a new instance
+     * Create a new instance.
      *
-     * @param threadName 线程名称
-     * @param config 执行器相关配置
+     * @param threadName 线程名称.
+     * @param config 执行器相关配置.
      */
     public IsolatedExecutor(String threadName, Config.ExecutorConfig config) {
         if(config == null || config.getGroupCount() < 1) {
@@ -47,6 +47,7 @@ public class IsolatedExecutor implements Executor {
     public void execute(Runnable task) {
         int id = 0;
         if(task instanceof IsolatedTask) {
+            // 分配的算法目前还不精致.
             id = ((IsolatedTask) task).getTransactionId() % groupCount;
         }
 
