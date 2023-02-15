@@ -22,6 +22,39 @@ public class Config {
     DriverConfig driverConfig;
 
     /**
+     * Create a new instance.
+     */
+    public void Config() {
+        executorConfig = new ExecutorConfig();
+        driverConfig = new DriverConfig();
+    }
+
+    public void setGroupCount(int groupCount) {
+        executorConfig.groupCount = groupCount;
+    }
+
+    public void setCoreThreadCount(int coreThreadCount) {
+        executorConfig.coreThreadCount = coreThreadCount;
+    }
+
+    public void setMaxThreadCount(int maxThreadCount) {
+        executorConfig.maxThreadCount = maxThreadCount;
+    }
+
+    public void setKeepAliveTimeSeconds(int keepAliveTimeSeconds) {
+        executorConfig.keepAliveTimeSeconds = keepAliveTimeSeconds;
+    }
+
+    public void setQueueSize(int queueSize) {
+        executorConfig.queueSize = queueSize;
+    }
+
+    public void setTimeout(int timeout) {
+        driverConfig.timeout = timeout;
+    }
+
+
+    /**
      * 执行器相关配置
      *
      * @author yanghuan
@@ -57,7 +90,7 @@ public class Config {
          */
         private int queueSize;
 
-        // 拒绝策略默认丢弃并打印日志.
+        // 拒绝策略默认丢弃.
     }
 
     /**
@@ -69,7 +102,7 @@ public class Config {
     public static class DriverConfig {
 
         /**
-         * 驱动超时时间(ms)
+         * view数据加载和渲染的超时时间(ms).
          */
         private long timeout;
     }
