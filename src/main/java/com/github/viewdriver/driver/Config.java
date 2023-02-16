@@ -24,7 +24,7 @@ public class Config {
     /**
      * Create a new instance.
      */
-    public void Config() {
+    public Config() {
         executorConfig = new ExecutorConfig();
         driverConfig = new DriverConfig();
     }

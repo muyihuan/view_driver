@@ -2,7 +2,10 @@ package com.github.viewdriver.driver.executor;
 
 import com.github.viewdriver.driver.Config;
 
-import java.util.concurrent.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 任务执行器.

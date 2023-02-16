@@ -33,7 +33,7 @@ public class DefViewDriver implements ViewDriver {
      * @param config 视图驱动相关配置.
      */
     public DefViewDriver(ViewDriverMetaData driverMeta, Config config) {
-        this(driverMeta, config, null, new ViewTreeParser());
+        this(driverMeta, config, null, new ViewTreeParser(driverMeta));
     }
 
     /**
