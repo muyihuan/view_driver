@@ -4,14 +4,13 @@ import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
+import com.fasterxml.jackson.databind.type.SimpleType;
 import com.github.viewdriver.driver.exception.MetaDataIsNullException;
 import com.github.viewdriver.driver.exception.NotViewException;
 import com.github.viewdriver.driver.exception.ParamIsNullException;
 import com.github.viewdriver.driver.metadata.ViewDriverMetaData;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -68,7 +67,16 @@ public class ViewTreeParser {
             return viewTree;
         }
 
-        // 1.通过fast json的能力去解析类信息
+        // 未解析的站左边.
+        List<Class> left = new ArrayList<>();
+        // 解析完的站右边.
+        Map<Class, ViewTreeNode> right = new HashMap<>();
+
+        left.add(view);
+
+        // 解析开始
+        while(left.size() > 0) {
+        }
 
         viewTree = new ViewTree();
         view_tree_cache.put(view, viewTree);
@@ -83,6 +91,10 @@ public class ViewTreeParser {
      */
     private List<BeanPropertyDefinition> getAllProperties(Class<?> classType) {
         JavaType javaType = jackson_helper.getTypeFactory().constructType(classType);
+        if(!(javaType instanceof SimpleType)) {
+            throw new RuntimeException("不支持该种类型的视图 => " + classType.getName());
+        }
+
         BeanDescription b = jackson_helper.getSerializationConfig().introspect(javaType);
         List<BeanPropertyDefinition> propertyDefinitions = b.findProperties();
         if(propertyDefinitions == null || propertyDefinitions.size() == 0) {
