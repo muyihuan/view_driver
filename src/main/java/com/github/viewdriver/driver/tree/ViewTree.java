@@ -21,7 +21,15 @@ import java.util.Map;
  */
 public class ViewTree {
 
-    private ViewTreeNode rootNode;
+    /**
+     * 根节点。
+     */
+    ViewTreeNode rootNode;
+
+    /**
+     * 存在依赖环.
+     */
+    Object cyclic;
 
     public List<ViewTreeNode> getDeptNodes(int dept) {
         return Collections.emptyList();

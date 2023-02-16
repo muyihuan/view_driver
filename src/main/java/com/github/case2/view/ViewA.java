@@ -55,4 +55,9 @@ public class ViewA {
      * 自己依赖自己类型
      */
     private ViewA dependentViewA;
+
+    /**
+     * View集合 不是通过 View id 查的
+     */
+    private ViewF[] viewFList;
 }
