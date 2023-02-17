@@ -5,13 +5,14 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.introspect.AnnotatedMethod;
 import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
-import com.fasterxml.jackson.databind.type.ArrayType;
 import com.fasterxml.jackson.databind.type.SimpleType;
-import com.github.case2.view.ViewA;
 import com.github.viewdriver.driver.exception.MetaDataIsNullException;
 import com.github.viewdriver.driver.exception.NotViewException;
 import com.github.viewdriver.driver.exception.ParamIsNullException;
 import com.github.viewdriver.driver.metadata.ViewDriverMetaData;
+import com.github.viewdriver.lambda.FieldGetter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
 import java.util.*;
@@ -20,15 +21,16 @@ import java.util.stream.Collectors;
 
 /**
  * 视图解析器.
- * .解析视图生成视图树
- * .根据视图树反向生成视图
+ * .解析视图生成视图树.
+ * .根据视图树反向生成视图.
  *
  * @author yanghuan
  */
 public class ViewTreeParser {
 
+    private static final Logger logger = LoggerFactory.getLogger(ViewTreeParser.class);
     private static final Map<Class<?>, ViewTree> view_tree_cache = new ConcurrentHashMap<>();
-    private final static ObjectMapper jackson_helper = new ObjectMapper();
+    private static final ObjectMapper jackson_helper = new ObjectMapper();
     private final ViewDriverMetaData driverMeta;
 
     /**
@@ -67,7 +69,7 @@ public class ViewTreeParser {
         viewTree = new ViewTree();
 
         Map<Class, ViewTreeNode> right = new HashMap<>();
-        viewTree.rootNode = buildViewTreeNode(rootView, 0, null, false, right);
+        viewTree.rootNode = generateViewTreeNode(rootView, 0, null, false, right);
 
         view_tree_cache.put(rootView, viewTree);
 
@@ -77,74 +79,180 @@ public class ViewTreeParser {
     /**
      * 构建视图树节点，通过注册的元数据进行推导.
      *
-     * @param right 进入解析状态的.
+     * @param nodeClass 节点的Class类型.
+     * @param type 节点类型.
+     * @param parent 父节点.
+     * @param isOneToN 父节点与本节点的关系是否是1:n.
+     * @param right 进入解析状态列表.
      * @return 节点.
      */
-    private ViewTreeNode buildViewTreeNode(Class<?> view, int type, ViewTreeNode parent, boolean isOneToN, Map<Class, ViewTreeNode> right) {
-        if(view == null) {
+    private ViewTreeNode generateViewTreeNode(Class<?> nodeClass, int type, ViewTreeNode parent, boolean isOneToN, Map<Class, ViewTreeNode> right) {
+        if(nodeClass == null) {
             return null;
+        }
+
+        // 已经进入解析状态的不需要再构建，防止循环依赖.
+        if(right.get(nodeClass) != null) {
+            return right.get(nodeClass);
         }
 
         ViewTreeNode node = new ViewTreeNode();
         node.type = type;
-        node.nodeClass = view;
+        node.nodeClass = nodeClass;
         if(parent != null) {
             node.fromParentLine = new ViewTreeLine(parent, node, isOneToN);
         }
 
-        // 进入解析状态
-        right.put(view, node);
+        // 进入解析状态.
+        right.put(nodeClass, node);
 
         List<ViewTreeNode> child_nodes = new ArrayList<>();
         Map<ViewTreeNode, Boolean> child_relations = new HashMap<>();
-        List<BeanPropertyDefinition> properties = getAllProperties(view);
+        List<BeanPropertyDefinition> properties = getAllProperties(nodeClass);
         for(BeanPropertyDefinition property : properties) {
             AnnotatedMethod getter = property.getGetter();
             Class<?> propertyType = getter.getAnnotated().getReturnType();
             boolean isArray = propertyType.isArray();
-            boolean isCollection = propertyType.isAssignableFrom(Collection.class);
+            boolean isCollection = Collection.class.isAssignableFrom(propertyType);
             if(isArray) {
-                ArrayType arrayType = (ArrayType) jackson_helper.getTypeFactory().constructType(propertyType);
-//                arrayType.getContentType().getClass();
-                Class elementType = null;
-                boolean isView = driverMeta.view_bind_model.containsKey(propertyType);
+                Class componentType = propertyType.getComponentType();
+                boolean isView = driverMeta.view_bind_model.containsKey(componentType);
                 if(isView) {
-                    Class parent_model = driverMeta.view_bind_model.get(view);
-                    Class child_model = driverMeta.view_bind_model.get(elementType);
+                    Class parent_model = driverMeta.view_bind_model.get(nodeClass);
+                    Class child_model = driverMeta.view_bind_model.get(componentType);
                     if(child_model == null) {
-                        ViewTreeNode childNode = buildViewTreeNode(propertyType, 0, node, true, right);
+                        ViewTreeNode childNode = generateViewTreeNode(componentType, 0, node, true, right);
                         child_nodes.add(childNode);
                         child_relations.put(childNode, true);
                     }
                     else {
-                        driverMeta.model_relation_by_outer_id.get(new ViewDriverMetaData.TwoModel(parent_model, child_model));
+                        FieldGetter outer_id_getter = driverMeta.model_relation_by_outer_id.get(new ViewDriverMetaData.TwoModel(parent_model, child_model));
+                        if(outer_id_getter != null) {
+                            Class outer_id_getter_return_type = outer_id_getter.getReturnType();
+                            boolean outerIdGetterIsArray = outer_id_getter_return_type.isArray();
+                            boolean outerIdGetterIsCollection = Collection.class.isAssignableFrom(outer_id_getter_return_type);
+                            if(outerIdGetterIsArray || outerIdGetterIsCollection) {
+                                ViewTreeNode childNode = generateViewTreeNode(componentType, 0, node, false, right);
+                                child_nodes.add(childNode);
+                                child_relations.put(childNode, false);
+                            }
+                            else {
+                                logger.info("解析视图遇到无法处理情况，无法推算两者关系 父视图 = " + nodeClass.getName() + "，子视图 = " + componentType.getName());
+                            }
+                        }
+                        else {
+                            outer_id_getter = driverMeta.model_relation_by_outer_id.get(new ViewDriverMetaData.TwoModel(child_model, parent_model));
+                            if(outer_id_getter != null) {
+                                Class outer_id_getter_return_type = outer_id_getter.getReturnType();
+                                boolean outerIdGetterIsArray = outer_id_getter_return_type.isArray();
+                                boolean outerIdGetterIsCollection = Collection.class.isAssignableFrom(outer_id_getter_return_type);
+                                if(outerIdGetterIsArray || outerIdGetterIsCollection) {
+                                    logger.info("解析视图遇到无法处理情况，无法推算两者关系 父视图 = " + nodeClass.getName() + "，子视图 = " + componentType.getName());
+                                }
+                                else {
+                                    ViewTreeNode childNode = generateViewTreeNode(componentType, 0, node, true, right);
+                                    child_nodes.add(childNode);
+                                    child_relations.put(childNode, true);
+                                }
+                            }
+                            else {
+                                logger.info("解析视图遇到无法处理情况，无法推算两者关系 父视图 = " + nodeClass.getName() + "，子视图 = " + componentType.getName());
+                            }
+                        }
                     }
                 }
                 else {
-                    ViewDriverMetaData.ViewAndGetter viewAndGetter = new ViewDriverMetaData.ViewAndGetter(view, getter.getName());
+                    ViewDriverMetaData.ViewAndGetter viewAndGetter = new ViewDriverMetaData.ViewAndGetter(nodeClass, getter.getName());
                     boolean isOuterAttribute = driverMeta.non_model_loader.containsKey(viewAndGetter);
                     if(isOuterAttribute) {
-                        ViewTreeNode childNode = buildViewTreeNode(elementType, 1, node, true, right);
+                        ViewTreeNode childNode = generateViewTreeNode(componentType, 1, node, true, right);
                         child_nodes.add(childNode);
                         child_relations.put(childNode, true);
                     }
                 }
             }
             else if(isCollection) {
+                Class elementType = Object.class;
+                Type genericReturnType = getter.getAnnotated().getGenericReturnType();
+                if(genericReturnType != null) {
+                    String typeName = genericReturnType.getTypeName();
+                    if(typeName != null && !"".equals(typeName)) {
+                        typeName = typeName.substring(typeName.indexOf("<") + 1, typeName.indexOf(">"));
+                        try {
+                            elementType = Class.forName(typeName);
+                        } catch (Exception e) {
+                            logger.error("Class.forName error typeName = " + typeName);
+                        }
+                    }
+                }
 
+                boolean isView = driverMeta.view_bind_model.containsKey(elementType);
+                if(isView) {
+                    Class parent_model = driverMeta.view_bind_model.get(nodeClass);
+                    Class child_model = driverMeta.view_bind_model.get(elementType);
+                    if(child_model == null) {
+                        ViewTreeNode childNode = generateViewTreeNode(elementType, 0, node, true, right);
+                        child_nodes.add(childNode);
+                        child_relations.put(childNode, true);
+                    }
+                    else {
+                        FieldGetter outer_id_getter = driverMeta.model_relation_by_outer_id.get(new ViewDriverMetaData.TwoModel(parent_model, child_model));
+                        if(outer_id_getter != null) {
+                            Class outer_id_getter_return_type = outer_id_getter.getReturnType();
+                            boolean outerIdGetterIsArray = outer_id_getter_return_type.isArray();
+                            boolean outerIdGetterIsCollection = Collection.class.isAssignableFrom(outer_id_getter_return_type);
+                            if(outerIdGetterIsArray || outerIdGetterIsCollection) {
+                                ViewTreeNode childNode = generateViewTreeNode(elementType, 0, node, false, right);
+                                child_nodes.add(childNode);
+                                child_relations.put(childNode, false);
+                            }
+                            else {
+                                logger.info("解析视图遇到无法处理情况，无法推算两者关系 父视图 = " + nodeClass.getName() + "，子视图 = " + elementType.getName());
+                            }
+                        }
+                        else {
+                            outer_id_getter = driverMeta.model_relation_by_outer_id.get(new ViewDriverMetaData.TwoModel(child_model, parent_model));
+                            if(outer_id_getter != null) {
+                                Class outer_id_getter_return_type = outer_id_getter.getReturnType();
+                                boolean outerIdGetterIsArray = outer_id_getter_return_type.isArray();
+                                boolean outerIdGetterIsCollection = Collection.class.isAssignableFrom(outer_id_getter_return_type);
+                                if(outerIdGetterIsArray || outerIdGetterIsCollection) {
+                                    logger.info("解析视图遇到无法处理情况，无法推算两者关系 父视图 = " + nodeClass.getName() + "，子视图 = " + elementType.getName());
+                                }
+                                else {
+                                    ViewTreeNode childNode = generateViewTreeNode(elementType, 0, node, true, right);
+                                    child_nodes.add(childNode);
+                                    child_relations.put(childNode, true);
+                                }
+                            }
+                            else {
+                                logger.info("解析视图遇到无法处理情况，无法推算两者关系 父视图 = " + nodeClass.getName() + "，子视图 = " + elementType.getName());
+                            }
+                        }
+                    }
+                }
+                else {
+                    ViewDriverMetaData.ViewAndGetter viewAndGetter = new ViewDriverMetaData.ViewAndGetter(nodeClass, getter.getName());
+                    boolean isOuterAttribute = driverMeta.non_model_loader.containsKey(viewAndGetter);
+                    if(isOuterAttribute) {
+                        ViewTreeNode childNode = generateViewTreeNode(elementType, 1, node, true, right);
+                        child_nodes.add(childNode);
+                        child_relations.put(childNode, true);
+                    }
+                }
             }
             else {
                 boolean isView = driverMeta.view_bind_model.containsKey(propertyType);
                 if(isView) {
-                    ViewTreeNode childNode = buildViewTreeNode(propertyType, 0, node, false, right);
+                    ViewTreeNode childNode = generateViewTreeNode(propertyType, 0, node, false, right);
                     child_nodes.add(childNode);
                     child_relations.put(childNode, false);
                 }
                 else {
-                    ViewDriverMetaData.ViewAndGetter viewAndGetter = new ViewDriverMetaData.ViewAndGetter(view, getter.getName());
+                    ViewDriverMetaData.ViewAndGetter viewAndGetter = new ViewDriverMetaData.ViewAndGetter(nodeClass, getter.getName());
                     boolean isOuterAttribute = driverMeta.non_model_loader.containsKey(viewAndGetter);
                     if(isOuterAttribute) {
-                        ViewTreeNode childNode = buildViewTreeNode(propertyType, 1, node, false, right);
+                        ViewTreeNode childNode = generateViewTreeNode(propertyType, 1, node, false, right);
                         child_nodes.add(childNode);
                         child_relations.put(childNode, false);
                     }
@@ -152,11 +260,18 @@ public class ViewTreeParser {
             }
         }
 
-        List<ViewTreeLine> toChildLines = new ArrayList<>();
+        boolean is_depend_self = false;
+        List<ViewTreeLine> to_child_lines = new ArrayList<>();
         for(ViewTreeNode childNode : child_nodes) {
-            toChildLines.add(new ViewTreeLine(parent, node, child_relations.get(childNode)));
+
+            to_child_lines.add(new ViewTreeLine(node, childNode, child_relations.get(childNode)));
+
+            if(node == childNode) {
+                is_depend_self = true;
+            }
         }
-        node.toChildLines = toChildLines;
+        node.toChildLines = to_child_lines;
+        node.isDependSelf = is_depend_self;
 
         return node;
     }
@@ -168,7 +283,7 @@ public class ViewTreeParser {
      *
      * @return 属性列表.
      */
-    private static List<BeanPropertyDefinition> getAllProperties(Class<?> classType) {
+    private List<BeanPropertyDefinition> getAllProperties(Class<?> classType) {
         JavaType javaType = jackson_helper.getTypeFactory().constructType(classType);
         if(!(javaType instanceof SimpleType)) {
             throw new RuntimeException("不支持该种类型的视图 => " + classType.getName());
@@ -181,23 +296,5 @@ public class ViewTreeParser {
         }
 
         return propertyDefinitions.stream().filter(BeanPropertyDefinition::hasGetter).collect(Collectors.toList());
-    }
-
-    public static void main(String[] args) {
-        List<BeanPropertyDefinition> properties = getAllProperties(ViewA.class);
-        for(BeanPropertyDefinition property : properties) {
-            AnnotatedMethod getter = property.getGetter();
-            Class<?> propertyType = getter.getAnnotated().getReturnType();
-            JavaType javaType = jackson_helper.getTypeFactory().constructType(propertyType);
-//            ()Ljava/util/List<Lcom/github/case2/view/ViewD;>;
-            String cn = getter.getAnnotated().getGenericReturnType().getTypeName();
-            boolean isArray = propertyType.isArray();
-            if(isArray) {
-                ArrayType arrayType = (ArrayType) jackson_helper.getTypeFactory().constructType(propertyType);
-                String kk = arrayType.getContentType().getTypeName();
-                assert kk == null;
-            }
-            assert javaType == null;
-        }
     }
 }

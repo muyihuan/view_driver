@@ -16,7 +16,7 @@ import java.util.concurrent.Executor;
  */
 public class IsolatedExecutor implements Executor {
 
-    private final Logger logger = LoggerFactory.getLogger(IsolatedExecutor.class);
+    private static final Logger logger = LoggerFactory.getLogger(IsolatedExecutor.class);
 
     private final List<ConfusedExecutor> threadPoolExecutorList = new ArrayList<>();
 

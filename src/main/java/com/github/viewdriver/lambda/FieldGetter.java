@@ -33,6 +33,15 @@ public interface FieldGetter<T, R> extends Function<T, R>, Serializable {
     }
 
     /**
+     * 获取getter返回值类型.
+     * @return 方法名称.
+     */
+    @SneakyThrows
+    default Class<?> getReturnType() {
+        return Class.forName(getClassName()).getMethod(getMethodName()).getReturnType();
+    }
+
+    /**
      * 获取getter对应的属性名称.
      * @return 属性名称.
      */

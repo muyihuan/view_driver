@@ -1,7 +1,6 @@
 package com.github.viewdriver.driver.metadata;
 
 import com.github.viewdriver.driver.exception.ParamIsNullException;
-import com.github.viewdriver.driver.executor.IsolatedExecutor;
 import com.github.viewdriver.lambda.FieldGetter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +22,7 @@ import java.util.function.Function;
  */
 public class ViewDriverMetaData implements ModelAndView {
 
-    private final Logger logger = LoggerFactory.getLogger(IsolatedExecutor.class);
+    private static final Logger logger = LoggerFactory.getLogger(ViewDriverMetaData.class);
 
     /**
      * 设置view和model绑定关系.

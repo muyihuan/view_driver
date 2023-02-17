@@ -15,7 +15,12 @@ public class ViewTreeNode {
     int type;
 
     /**
-     * 视图的类型 或 非视图的类型.
+     * 是否存在自己依赖自己
+     */
+    boolean isDependSelf;
+
+    /**
+     * 视图 或 非视图.
      */
     Class nodeClass;
 
