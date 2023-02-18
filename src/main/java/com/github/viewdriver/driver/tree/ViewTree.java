@@ -1,8 +1,11 @@
 package com.github.viewdriver.driver.tree;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 视图树.
@@ -21,24 +24,81 @@ import java.util.Map;
  */
 public class ViewTree {
 
+    private static final Logger logger = LoggerFactory.getLogger(ViewTree.class);
+    private int max_dept;
+
     /**
-     * 根节点。
+     * 根节点.
      */
     ViewTreeNode rootNode;
 
+
     /**
-     * 存在依赖环.
+     * 获取视图树第几层的所有节点，跟节点为第一层.
+     * @param dept 第几层.
+     * @return 所有节点.
      */
-    Object cyclic;
-
     public List<ViewTreeNode> getDeptNodes(int dept) {
-        return Collections.emptyList();
+        if(dept <= 0) {
+            return Collections.emptyList();
+        }
+
+        ViewTreeNode curr_dept_first = rootNode;
+        int curr_dept = 1;
+        while(true) {
+            if(curr_dept == dept) {
+                List<ViewTreeNode> nodes = new ArrayList<>();
+                ViewTreeNode node = curr_dept_first;
+                while(node != null) {
+                    nodes.add(node);
+
+                    ViewTreeLine to_brother_line = node.toBrotherLine;
+                    if(to_brother_line == null) {
+                        node = null;
+                    }
+                    else {
+                        node = to_brother_line.right;
+                    }
+                }
+                return nodes;
+            }
+
+            List<ViewTreeLine> to_child_lines = curr_dept_first.toChildLines;
+            if(to_child_lines == null || to_child_lines.size() == 0) {
+                ViewTreeLine to_brother_line = rootNode.toBrotherLine;
+                if(to_brother_line == null) {
+                    max_dept = curr_dept;
+                    return Collections.emptyList();
+                }
+                else {
+                    curr_dept_first = to_brother_line.right;
+                }
+            }
+            else {
+                curr_dept_first = to_child_lines.get(0).right;
+                curr_dept ++;
+            }
+
+            if(curr_dept % 100 == 0) {
+                logger.info("请注意当前已进入视图树的第 " + curr_dept + "层");
+            }
+        }
     }
 
-    public Map<Class<?>, List> getDeptLoadModel(int dept) {
-        return Collections.emptyMap();
-    }
+    /**
+     * 可视化视图树.
+     */
+    void draw_it() {
+        if(!logger.isDebugEnabled()) {
+            return;
+        }
 
-    public void setDeptLoadModel(int dept, Map<Class<?>, List> models) {
+        if(rootNode == null) {
+            logger.debug("********************空*********************");
+            return;
+        }
+
+        logger.debug("请查看视图树=> *********************************");
+        logger.debug("*********************************************");
     }
 }

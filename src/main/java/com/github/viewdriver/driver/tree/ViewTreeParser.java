@@ -73,11 +73,14 @@ public class ViewTreeParser {
 
         view_tree_cache.put(rootView, viewTree);
 
+        viewTree.draw_it();
+
         return viewTree;
     }
 
     /**
      * 构建视图树节点，通过注册的元数据进行推导.
+     * todo 支持继承关系、基础属性、getter方法.
      *
      * @param nodeClass 节点的Class类型.
      * @param type 节点类型.
@@ -262,9 +265,13 @@ public class ViewTreeParser {
 
         boolean is_depend_self = false;
         List<ViewTreeLine> to_child_lines = new ArrayList<>();
-        for(ViewTreeNode childNode : child_nodes) {
-
+        for(int i = 0; i < child_nodes.size(); i ++) {
+            ViewTreeNode childNode = child_nodes.get(i);
             to_child_lines.add(new ViewTreeLine(node, childNode, child_relations.get(childNode)));
+
+            if(i < (child_nodes.size() - 1)) {
+                childNode.toBrotherLine = new ViewTreeLine(childNode, child_nodes.get(i + 1), false);
+            }
 
             if(node == childNode) {
                 is_depend_self = true;

@@ -9,10 +9,13 @@ import com.github.viewdriver.driver.metadata.ViewDriverMetaData;
 import com.github.viewdriver.driver.tree.ViewTree;
 import com.github.viewdriver.driver.tree.ViewTreeNode;
 import com.github.viewdriver.driver.tree.ViewTreeParser;
+import lombok.Data;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executor;
-import java.util.function.Function;
 
 /**
  * 默认视图驱动器.
@@ -70,86 +73,128 @@ public class DefViewDriver implements ViewDriver {
     }
 
     @Override
-    public <V> List<V> mapView(List models, Class<V> viewClass, Context context) throws Exception {
+    public <V> List<V> mapView(List inputDataList, Class<V> viewClass, Context context) throws Exception {
         if(driverMeta == null) {
             throw new MetaDataIsNullException();
         }
 
-        if(models == null || models.size() == 0) {
+        if(inputDataList == null || inputDataList.size() == 0) {
             return Collections.emptyList();
         }
 
-        // 生成视图树
         ViewTree viewTree = viewParser.generateViewTree(viewClass);
 
-        // 获取视图绑定的model view_model.get(viewClass)
-        Class<?> modelClass = null;
-        List topModels;
-        if(modelClass.isInstance(models.get(0))) {
-            topModels = models;
-        }
-        else {
-            // 获取model加载器 model_loader.get(modelClass)
-            Function<List, Map> modelLoader = null;
-            Map map = modelLoader.apply(models);
-            topModels = new ArrayList(map.values());
-        }
-        Map<Class<?>, List> topData = new HashMap<>();
-        topData.put(modelClass, topModels);
-        viewTree.setDeptLoadModel(0, topData);
-
-        int dept = 1;
+        int root_dept = 1;
+        int curr_dept = root_dept;
+        Map<Class, Map<Object, Object>> loaded_models = new HashMap<>();
         while(true) {
-            int toDept = dept;
-            dept ++;
-            List<ViewTreeNode> nodes = viewTree.getDeptNodes(toDept);
+            List<ViewTreeNode> nodes = viewTree.getDeptNodes(curr_dept);
             if(nodes == null || nodes.size() == 0) {
-                break;
+                return Collections.emptyList();
             }
 
-            Map<Class<?>, List> deptModels = viewTree.getDeptLoadModel(toDept - 1);
-            if(deptModels == null || deptModels.size() == 0) {
-                break;
-            }
-
-            Map<ViewTreeNode, List> collectIdsMap = new HashMap<>();
-            // 抽取
-            for(ViewTreeNode node : nodes) {
-                List<Object> collectIds = new ArrayList<>();
-
-                // model id 抽取 id_getter.get(node.getNeed())
-                Map<Class<?>, Function<Object, Object>> getters = null;
-                getters.keySet().forEach(mClass -> {
-                    Function<Object, Object> get = getters.get(mClass);
-                    List list = deptModels.get(mClass);
-                    list.forEach(ids -> {
-                        if(ids instanceof Collection) {
-                            ((Collection) ids).forEach(id -> {
-                                collectIds.add(get.apply(ids));
-                            });
-                        }
-                        else {
-                            collectIds.add(get.apply(ids));
-                        }
-                    });
-                });
-
-                collectIdsMap.put(node, collectIds);
-            }
-
-            // model加载
-            for(ViewTreeNode node : collectIdsMap.keySet()) {
+            if(curr_dept == root_dept) {
 
             }
+            else {
+
+            }
+
+            curr_dept ++;
         }
 
-        // 通用动态代理实现视图渲染
-        List<V> viewResult = new ArrayList<>(models.size());
-        for(int i = 0; i < models.size(); i ++) {
-            V view = viewClass.newInstance();
 
-        }
 
-        return Collections.emptyList();
+
+//        // 获取视图绑定的model view_model.get(viewClass)
+//        Class<?> modelClass = Object.class;
+//        List topModels;
+//        if(modelClass.isInstance(inputDataList.get(0))) {
+//            topModels = inputDataList;
+//        }
+//        else {
+//            // 获取model加载器 model_loader.get(modelClass)
+//            Function<List, Map> modelLoader = null;
+//            Map map = modelLoader.apply(inputDataList);
+//            topModels = new ArrayList(map.values());
+//        }
+//        Map<Class<?>, List> topData = new HashMap<>();
+//        topData.put(modelClass, topModels);
+//
+//        int dept = 1;
+//        while(true) {
+//            int toDept = dept;
+//            dept ++;
+//            List<ViewTreeNode> nodes = viewTree.getDeptNodes(toDept);
+//            if(nodes == null || nodes.size() == 0) {
+//                break;
+//            }
+//
+//            // viewTree.getDeptNodes(toDept - 1)
+//            Map<Class<?>, List> deptModels = null;
+//            if(deptModels == null || deptModels.size() == 0) {
+//                break;
+//            }
+//
+//            Map<ViewTreeNode, List> collectIdsMap = new HashMap<>();
+//            // 抽取
+//            for(ViewTreeNode node : nodes) {
+//                List<Object> collectIds = new ArrayList<>();
+//
+//                // model id 抽取 id_getter.get(node.getNeed())
+//                Map<Class<?>, Function<Object, Object>> getters = null;
+//                getters.keySet().forEach(mClass -> {
+//                    Function<Object, Object> get = getters.get(mClass);
+//                    List list = deptModels.get(mClass);
+//                    list.forEach(ids -> {
+//                        if(ids instanceof Collection) {
+//                            ((Collection) ids).forEach(id -> {
+//                                collectIds.add(get.apply(ids));
+//                            });
+//                        }
+//                        else {
+//                            collectIds.add(get.apply(ids));
+//                        }
+//                    });
+//                });
+//
+//                collectIdsMap.put(node, collectIds);
+//            }
+//
+//            // model加载
+//            for(ViewTreeNode node : collectIdsMap.keySet()) {
+//
+//            }
+//        }
+//
+//        // 通用动态代理实现视图渲染
+//        List<V> viewResult = new ArrayList<>(inputDataList.size());
+//        for(int i = 0; i < inputDataList.size(); i ++) {
+//            V view = viewClass.newInstance();
+//
+//        }
+
+//        return Collections.emptyList();
+    }
+
+    /**
+     * 需要
+     */
+    @Data
+    private static class Need {
+
+        private Class<?> fromModel;
+
+        // 需要什么是model吗
+        private boolean isNeedModel;
+
+        // 是否是1对n查
+        private boolean isN;
+
+        // 目标model
+        private Class<?> toModel;
+
+        // 外部非model
+        private String viewAttribute;
     }
 }

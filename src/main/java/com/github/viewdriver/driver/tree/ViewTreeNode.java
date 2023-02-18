@@ -30,7 +30,12 @@ public class ViewTreeNode {
     ViewTreeLine fromParentLine;
 
     /**
-     * 连接的子节点的连线.
+     * 连向兄弟节点的连线，从 左 -> 右.
+     */
+    ViewTreeLine toBrotherLine;
+
+    /**
+     * 连向的子节点的连线.
      */
     List<ViewTreeLine> toChildLines;
 }

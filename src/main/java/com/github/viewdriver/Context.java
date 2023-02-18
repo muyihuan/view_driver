@@ -10,11 +10,7 @@ import java.util.Map;
  */
 public class Context {
 
-    private final Map<String, Object> data;
-
-    public Context() {
-        data = new HashMap<>();
-    }
+    private final Map<String, Object> data = new HashMap<>();
 
     public void put(String key, Object value) {
         data.put(key, value);

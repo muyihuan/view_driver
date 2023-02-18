@@ -7,9 +7,9 @@ package com.github.viewdriver.driver.tree;
  */
 public class ViewTreeLine {
 
-    private ViewTreeNode left;
-    private ViewTreeNode right;
-    private boolean is_one_to_n;
+    ViewTreeNode left;
+    ViewTreeNode right;
+    boolean is_one_to_n;
 
     /**
      * Create a new instance.
