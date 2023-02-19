@@ -86,17 +86,23 @@ public class DefViewDriver implements ViewDriver {
 
         int root_dept = 1;
         int curr_dept = root_dept;
-        Map<Class, Map<Object, Object>> loaded_models = new HashMap<>();
+        Map<Class, Map<Object, Object>> model_one = new HashMap<>();
+        Map<Class, Map<Object, List<Object>>> model_n = new HashMap<>();
         while(true) {
-            List<ViewTreeNode> nodes = viewTree.getDeptNodes(curr_dept);
-            if(nodes == null || nodes.size() == 0) {
-                return Collections.emptyList();
-            }
-
             if(curr_dept == root_dept) {
+                Class<?> modelClass = driverMeta.view_bind_model.get(viewClass);
+                if(modelClass.isInstance(inputDataList.get(0))) {
 
+                }
+                else {
+
+                }
             }
             else {
+                List<ViewTreeNode> nodes = viewTree.getDeptNodes(curr_dept);
+                if(nodes == null || nodes.size() == 0) {
+                    break;
+                }
 
             }
 

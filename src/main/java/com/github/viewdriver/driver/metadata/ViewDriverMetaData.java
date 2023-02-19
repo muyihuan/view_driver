@@ -165,7 +165,7 @@ public class ViewDriverMetaData implements ModelAndView {
             }
         });
 
-        // 更精细的校验.
+        // 更精细的校验：类型是否匹配等.
     }
 
 

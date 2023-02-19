@@ -3,9 +3,7 @@ package com.github.viewdriver.driver.tree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * 视图树.
@@ -32,7 +30,6 @@ public class ViewTree {
      */
     ViewTreeNode rootNode;
 
-
     /**
      * 获取视图树第几层的所有节点，跟节点为第一层.
      * @param dept 第几层.
@@ -43,46 +40,33 @@ public class ViewTree {
             return Collections.emptyList();
         }
 
-        ViewTreeNode curr_dept_first = rootNode;
+        if(max_dept > 0 && dept > max_dept) {
+            return Collections.emptyList();
+        }
+
+        Queue<ViewTreeNode> curr_dept_nodes = new LinkedList<>();
+        curr_dept_nodes.offer(rootNode);
         int curr_dept = 1;
-        while(true) {
-            if(curr_dept == dept) {
-                List<ViewTreeNode> nodes = new ArrayList<>();
-                ViewTreeNode node = curr_dept_first;
-                while(node != null) {
-                    nodes.add(node);
-
-                    ViewTreeLine to_brother_line = node.toBrotherLine;
-                    if(to_brother_line == null) {
-                        node = null;
-                    }
-                    else {
-                        node = to_brother_line.right;
-                    }
+        while (curr_dept != dept) {
+            int count = curr_dept_nodes.size();
+            while (count > 0) {
+                ViewTreeNode node = curr_dept_nodes.poll();
+                if (node != null && node.toChildLines != null && node.toChildLines.size() > 0) {
+                    node.toChildLines.forEach(line -> {
+                        curr_dept_nodes.offer(line.right);
+                    });
                 }
-                return nodes;
+
+                count--;
             }
 
-            List<ViewTreeLine> to_child_lines = curr_dept_first.toChildLines;
-            if(to_child_lines == null || to_child_lines.size() == 0) {
-                ViewTreeLine to_brother_line = rootNode.toBrotherLine;
-                if(to_brother_line == null) {
-                    max_dept = curr_dept;
-                    return Collections.emptyList();
-                }
-                else {
-                    curr_dept_first = to_brother_line.right;
-                }
-            }
-            else {
-                curr_dept_first = to_child_lines.get(0).right;
-                curr_dept ++;
-            }
-
-            if(curr_dept % 100 == 0) {
+            curr_dept++;
+            if (curr_dept % 100 == 0) {
                 logger.info("请注意当前已进入视图树的第 " + curr_dept + "层");
             }
         }
+
+        return new ArrayList<>(curr_dept_nodes);
     }
 
     /**

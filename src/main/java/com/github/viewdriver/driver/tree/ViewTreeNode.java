@@ -1,5 +1,6 @@
 package com.github.viewdriver.driver.tree;
 
+import java.lang.reflect.Method;
 import java.util.List;
 
 /**
@@ -25,14 +26,14 @@ public class ViewTreeNode {
     Class nodeClass;
 
     /**
+     * 对应的getter方法
+     */
+    Method getter;
+
+    /**
      * 父节点连向自己的连线.
      */
     ViewTreeLine fromParentLine;
-
-    /**
-     * 连向兄弟节点的连线，从 左 -> 右.
-     */
-    ViewTreeLine toBrotherLine;
 
     /**
      * 连向的子节点的连线.
