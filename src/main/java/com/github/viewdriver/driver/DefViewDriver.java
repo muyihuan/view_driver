@@ -11,11 +11,9 @@ import com.github.viewdriver.driver.tree.ViewTreeNode;
 import com.github.viewdriver.driver.tree.ViewTreeParser;
 import lombok.Data;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Executor;
+import java.util.stream.Collectors;
 
 /**
  * 默认视图驱动器.
@@ -86,13 +84,12 @@ public class DefViewDriver implements ViewDriver {
 
         int root_dept = 1;
         int curr_dept = root_dept;
-        Map<Class, Map<Object, Object>> model_one = new HashMap<>();
-        Map<Class, Map<Object, List<Object>>> model_n = new HashMap<>();
+        ModelHouse modelHouse = new ModelHouse();
         while(true) {
             if(curr_dept == root_dept) {
                 Class<?> modelClass = driverMeta.view_bind_model.get(viewClass);
                 if(modelClass.isInstance(inputDataList.get(0))) {
-
+                    inputDataList.forEach(data -> modelHouse.saveModel(modelClass, data, data));
                 }
                 else {
 
@@ -180,27 +177,105 @@ public class DefViewDriver implements ViewDriver {
 //
 //        }
 
-//        return Collections.emptyList();
+        return Collections.emptyList();
     }
 
     /**
-     * 需要
+     * 存储加载好的model.
+     *
+     * @author yanghuan
      */
     @Data
-    private static class Need {
+    private static class ModelHouse {
+        Map<Class, Map<Object, Object>> model_1 = new HashMap<>();
+        Map<Class, Map<Object, List<Object>>> model_n = new HashMap<>();
 
-        private Class<?> fromModel;
+        /**
+         * 保存model.
+         *
+         * @param modelClass model类型.
+         * @param id model的ID.
+         * @param model model.
+         */
+        private void saveModel(Class modelClass, Object id, Object model) {
+            Map<Object, Object> data = model_1.get(modelClass);
+            if(data == null) {
+                model_1.put(modelClass, new LinkedHashMap<>());
 
-        // 需要什么是model吗
-        private boolean isNeedModel;
+                saveModel(modelClass, id, model);
+            }
+            else {
+                data.put(id, model);
+            }
+        }
 
-        // 是否是1对n查
-        private boolean isN;
+        /**
+         * 通过ID获取某类型的所有model.
+         *
+         * @param modelClass model类型.
+         * @param id model的ID.
+         * @return model.
+         */
+        private Object getModelById(Class modelClass, Object id) {
+            Map<Object, Object> data = model_1.get(modelClass);
+            if(data == null) {
+                return null;
+            }
+            else {
+                return data.get(id);
+            }
+        }
 
-        // 目标model
-        private Class<?> toModel;
+        /**
+         * 获取某类型的所有model.
+         *
+         * @param modelClass model类型.
+         * @return model集合.
+         */
+        private List<Object> getAllModelByType(Class modelClass) {
+            Map<Object, Object> data = model_1.get(modelClass);
+            if(data == null) {
+                return Collections.emptyList();
+            }
+            else {
+                return new ArrayList<>(model_1.values());
+            }
+        }
 
-        // 外部非model
-        private String viewAttribute;
+        /**
+         * 保存model集合.
+         *
+         * @param modelClass model类型.
+         * @param outerId 外键ID.
+         * @param models model集合.
+         */
+        private void saveModelList(Class modelClass, Object outerId, List<Object> models) {
+            Map<Object, List<Object>> data = model_n.get(modelClass);
+            if(data == null) {
+                model_1.put(modelClass, new HashMap<>());
+
+                saveModel(modelClass, outerId, models);
+            }
+            else {
+                data.put(outerId, models);
+            }
+        }
+
+        /**
+         * 通过ID获取某类型的所有model.
+         *
+         * @param modelClass model类型.
+         * @param outerId 外键ID.
+         * @return model集合.
+         */
+        private List<Object> getModelListByOuterId(Class modelClass, Object outerId) {
+            Map<Object, List<Object>> data = model_n.get(modelClass);
+            if(data == null) {
+                return Collections.emptyList();
+            }
+            else {
+                return data.get(outerId);
+            }
+        }
     }
 }
