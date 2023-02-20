@@ -49,6 +49,10 @@ public class ViewTree {
         int curr_dept = 1;
         while (curr_dept != dept) {
             int count = curr_dept_nodes.size();
+            if(count == 0) {
+                max_dept = curr_dept;
+            }
+
             while (count > 0) {
                 ViewTreeNode node = curr_dept_nodes.poll();
                 if (node != null && node.toChildLines != null && node.toChildLines.size() > 0) {
