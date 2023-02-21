@@ -74,7 +74,7 @@ public class Demo {
                 .modelLoaderById(ModelB.class, (ids, context) -> modelBDomainService.batchGetModelBs(ids))
                 .modelLoaderById(ModelD.class, (ids, context) -> modelDDomainService.batchGetModelDs(ids))
                 .modelLoaderByOuterId(ModelC.class, ModelC::getModelAId, (ids, context) -> modelCDomainService.queryModelCList(ids, (Integer) context.get("page"), (Integer) context.get("count")))
-                .modelLoaderByOuterId(ModelC.class, ModelC::getModelAId, (ids, context) -> modelCDomainService.queryModelCList(ids, (Integer) context.get("page"), (Integer) context.get("count")), ViewA::getViewC2List)
+                .modelLoaderByOuterId(ModelC.class, ModelC::getModelAId, (ids, context) -> modelCDomainService.queryModelC2List(ids, (Integer) context.get("page"), (Integer) context.get("count")), ViewA::getViewC2List)
                 .modelLoaderByOuterId(ModelE.class, ModelE::getModelAId, (ids, context) -> modelEDomainService.batchGetModelEs(ids))
                 .modelLoaderByOuterId(ModelF.class, ModelF::getModelBId, (ids, context) -> modelFDomainService.batchGetModelFs(ids))
                 .nonModelLoader(ViewA::getOuterAttributeAf, ModelA::getId, (ids, context) -> Collections.emptyMap())
@@ -84,12 +84,14 @@ public class Demo {
     }
 
     public static void main(String[] args) throws Exception {
+        Context context = new Context();
+
         List<Long> ids = new ArrayList<>();
         ids.add(1L);
-        List<ViewA> viewAList = defViewDriver.mapView(ids, ViewA.class, null);
+        List<ViewA> viewAList = defViewDriver.mapView(ids, ViewA.class, context);
 
         List<ModelB> modelBList = new ArrayList<>();
         modelBList.add(new ModelB());
-        List<ViewB> viewBList = defViewDriver.mapView(modelBList, ViewB.class, null);
+        List<ViewB> viewBList = defViewDriver.mapView(modelBList, ViewB.class, context);
     }
 }

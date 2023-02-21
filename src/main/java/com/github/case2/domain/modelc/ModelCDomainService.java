@@ -14,4 +14,8 @@ public class ModelCDomainService {
     public Map<Long, List<ModelC>> queryModelCList(List<Long> ids, Integer page, Integer count) {
         return Collections.emptyMap();
     }
+
+    public Map<Long, List<ModelC>> queryModelC2List(List<Long> ids, Integer page, Integer count) {
+        return Collections.emptyMap();
+    }
 }
