@@ -90,11 +90,18 @@ public class ViewDriverBuilder {
         }
 
         idBindMap.forEach((idGetter, bindModel) -> {
-            if(bindModel.getName().equals(model.getName())) {
+            if(bindModel.getName().equals(model.getName()) && driverMetaData.model_id_getter.get(model) != null) {
                 driverMetaData.model_id_getter.put(model, idGetter);
             }
             else {
-                driverMetaData.model_relation_by_outer_id.put(new ViewDriverMetaData.TwoModel(model, bindModel), idGetter);
+                ViewDriverMetaData.TwoModel twoModel = new ViewDriverMetaData.TwoModel(model, bindModel);
+                FieldGetter getter = driverMetaData.model_relation_by_outer_id.get(twoModel);
+                if(getter != null) {
+                    throw new RuntimeException("model 外键id存在多个绑定关系，暂不支持!");
+                }
+                else {
+                    driverMetaData.model_relation_by_outer_id.put(twoModel, idGetter);
+                }
             }
         });
 

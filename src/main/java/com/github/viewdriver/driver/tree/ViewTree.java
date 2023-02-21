@@ -31,6 +31,15 @@ public class ViewTree {
     ViewTreeNode rootNode;
 
     /**
+     * 获取树的根节点.
+     *
+     * @return 根节点.
+     */
+    public ViewTreeNode getRoot() {
+        return rootNode;
+    }
+
+    /**
      * 获取视图树第几层的所有节点，跟节点为第一层.
      * @param dept 第几层.
      * @return 所有节点.
@@ -71,6 +80,15 @@ public class ViewTree {
         }
 
         return new ArrayList<>(curr_dept_nodes);
+    }
+
+    /**
+     * 视图树是否为空.
+     *
+     * @return true: 空、 false: 不为空.
+     */
+    public boolean isNull() {
+        return rootNode == null;
     }
 
     /**

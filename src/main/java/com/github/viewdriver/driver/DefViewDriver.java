@@ -3,16 +3,22 @@ package com.github.viewdriver.driver;
 import com.github.viewdriver.Context;
 import com.github.viewdriver.ViewDriver;
 import com.github.viewdriver.driver.exception.MetaDataIsNullException;
+import com.github.viewdriver.driver.exception.NotViewException;
 import com.github.viewdriver.driver.executor.ConfusedExecutor;
 import com.github.viewdriver.driver.executor.IsolatedExecutor;
 import com.github.viewdriver.driver.metadata.ViewDriverMetaData;
 import com.github.viewdriver.driver.tree.ViewTree;
+import com.github.viewdriver.driver.tree.ViewTreeLine;
 import com.github.viewdriver.driver.tree.ViewTreeNode;
 import com.github.viewdriver.driver.tree.ViewTreeParser;
+import com.github.viewdriver.lambda.FieldGetter;
 import lombok.Data;
 
 import java.util.*;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Future;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 /**
  * 默认视图驱动器.
@@ -80,95 +86,21 @@ public class DefViewDriver implements ViewDriver {
         }
 
         ViewTree viewTree = viewParser.generateViewTree(viewClass);
-
-        int root_dept = 1;
-        int curr_dept = root_dept;
-        ModelHouse modelHouse = new ModelHouse();
-        while(true) {
-            if(curr_dept == root_dept) {
-                Class<?> modelClass = driverMeta.view_bind_model.get(viewClass);
-                if(modelClass.isInstance(inputDataList.get(0))) {
-                    inputDataList.forEach(data -> modelHouse.saveModel(modelClass, data, data));
-                }
-                else {
-
-                }
-            }
-            else {
-                List<ViewTreeNode> nodes = viewTree.getDeptNodes(curr_dept);
-                if(nodes == null || nodes.size() == 0) {
-                    break;
-                }
-
-            }
-
-            curr_dept ++;
+        if(viewTree.isNull()) {
+            throw new NotViewException();
         }
 
+        if(context == null) {
+            context = new Context();
+        }
+
+        ViewTreeNode root_node = viewTree.getRoot();
+        ModelHouse model_house = new ModelHouse();
+        // 数据加载
+        load_mode(root_node, true, inputDataList, context, model_house);
 
 
 
-//        // 获取视图绑定的model view_model.get(viewClass)
-//        Class<?> modelClass = Object.class;
-//        List topModels;
-//        if(modelClass.isInstance(inputDataList.get(0))) {
-//            topModels = inputDataList;
-//        }
-//        else {
-//            // 获取model加载器 model_loader.get(modelClass)
-//            Function<List, Map> modelLoader = null;
-//            Map map = modelLoader.apply(inputDataList);
-//            topModels = new ArrayList(map.values());
-//        }
-//        Map<Class<?>, List> topData = new HashMap<>();
-//        topData.put(modelClass, topModels);
-//
-//        int dept = 1;
-//        while(true) {
-//            int toDept = dept;
-//            dept ++;
-//            List<ViewTreeNode> nodes = viewTree.getDeptNodes(toDept);
-//            if(nodes == null || nodes.size() == 0) {
-//                break;
-//            }
-//
-//            // viewTree.getDeptNodes(toDept - 1)
-//            Map<Class<?>, List> deptModels = null;
-//            if(deptModels == null || deptModels.size() == 0) {
-//                break;
-//            }
-//
-//            Map<ViewTreeNode, List> collectIdsMap = new HashMap<>();
-//            // 抽取
-//            for(ViewTreeNode node : nodes) {
-//                List<Object> collectIds = new ArrayList<>();
-//
-//                // model id 抽取 id_getter.get(node.getNeed())
-//                Map<Class<?>, Function<Object, Object>> getters = null;
-//                getters.keySet().forEach(mClass -> {
-//                    Function<Object, Object> get = getters.get(mClass);
-//                    List list = deptModels.get(mClass);
-//                    list.forEach(ids -> {
-//                        if(ids instanceof Collection) {
-//                            ((Collection) ids).forEach(id -> {
-//                                collectIds.add(get.apply(ids));
-//                            });
-//                        }
-//                        else {
-//                            collectIds.add(get.apply(ids));
-//                        }
-//                    });
-//                });
-//
-//                collectIdsMap.put(node, collectIds);
-//            }
-//
-//            // model加载
-//            for(ViewTreeNode node : collectIdsMap.keySet()) {
-//
-//            }
-//        }
-//
 //        // 通用动态代理实现视图渲染
 //        List<V> viewResult = new ArrayList<>(inputDataList.size());
 //        for(int i = 0; i < inputDataList.size(); i ++) {
@@ -177,6 +109,84 @@ public class DefViewDriver implements ViewDriver {
 //        }
 
         return Collections.emptyList();
+    }
+
+    /**
+     * model 加载.
+     *
+     * @param node 节点.
+     * @param is_root 是否是根节点.
+     * @param inputDataList 输入数据.
+     */
+    private void load_mode(ViewTreeNode node, boolean is_root, List inputDataList, Context context, ModelHouse model_house) {
+        if(is_root) {
+            Class<?> model_class = driverMeta.view_bind_model.get(node.getNodeClass());
+            Function idGetter = driverMeta.model_id_getter.get(model_class);
+            if(model_class.isInstance(inputDataList.get(0))) {
+                inputDataList.forEach(data -> {
+                    model_house.saveModel(model_class, idGetter.apply(data), data);
+
+                    if(node.isDependSelf()) {
+                        FieldGetter _getter = driverMeta.model_relation_by_outer_id.get(new ViewDriverMetaData.TwoModel(model_class, model_class));
+                        if(_getter != null) {
+                            model_house.saveModel(model_class, idGetter.apply(_getter.apply(data)), _getter.apply(data));
+                        }
+                    }
+                });
+            }
+            else {
+                BiFunction modelLoader = driverMeta.model_loader_by_id.get(model_class);
+                Map modelMap = (Map) modelLoader.apply(inputDataList, config);
+                modelMap.forEach((key, value) -> {
+                    model_house.saveModel(model_class, key, value);
+
+                    if(node.isDependSelf()) {
+                        FieldGetter _getter = driverMeta.model_relation_by_outer_id.get(new ViewDriverMetaData.TwoModel(model_class, model_class));
+                        if(_getter != null) {
+                            model_house.saveModel(model_class, idGetter.apply(_getter.apply(value)), _getter.apply(value));
+                        }
+                    }
+                });
+            }
+
+            List<ViewTreeNode> nodes = node.getChildNodes();
+            for(ViewTreeNode _node : nodes) {
+                executor.execute(() -> {
+                    load_mode(_node, false, inputDataList, context, model_house);
+                });
+            }
+        }
+        else {
+            if(node.getType() == 0) {
+                // 父节点的model信息
+                ViewTreeLine from_parent_line = node.getFromParentLine();
+                ViewTreeNode parent_node = from_parent_line.getLeft();
+                Class<?> parent_view_class = parent_node.getNodeClass();
+                Class<?> parent_model_class = driverMeta.view_bind_model.get(parent_view_class);
+                List parent_models = model_house.getAllModelByType(parent_model_class);
+                if(parent_models != null && parent_models.size() > 0) {
+                    // 需要加载该 modelClass
+                    Class<?> need_model_class = driverMeta.view_bind_model.get(node.getNodeClass());
+
+                    // 计算如何加载
+                    boolean is_one_to_n = from_parent_line.is_one_to_n();
+                    if(is_one_to_n) {
+
+                    }
+                    else {
+                        FieldGetter getter = driverMeta.model_relation_by_outer_id.get(new ViewDriverMetaData.TwoModel(parent_model_class, need_model_class));
+                        List collect_ids = new ArrayList();
+
+                    }
+
+
+                    // 收集查询 modelClass 的ID
+                }
+            }
+            else {
+
+            }
+        }
     }
 
     /**

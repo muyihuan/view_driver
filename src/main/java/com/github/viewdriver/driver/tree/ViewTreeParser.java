@@ -3,7 +3,6 @@ package com.github.viewdriver.driver.tree;
 import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.introspect.AnnotatedMethod;
 import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
 import com.fasterxml.jackson.databind.type.SimpleType;
 import com.github.viewdriver.driver.exception.MetaDataIsNullException;
@@ -103,7 +102,7 @@ public class ViewTreeParser {
         ViewTreeNode node = new ViewTreeNode();
         node.type = type;
         node.nodeClass = nodeClass;
-        node.getter = getter;
+        node.parentGetter = getter;
         if(parent != null) {
             node.fromParentLine = new ViewTreeLine(parent, node, isOneToN);
         }
@@ -115,8 +114,8 @@ public class ViewTreeParser {
         Map<ViewTreeNode, Boolean> child_relations = new HashMap<>();
         List<BeanPropertyDefinition> properties = getAllProperties(nodeClass);
         for(BeanPropertyDefinition property : properties) {
-            AnnotatedMethod _getter = property.getGetter();
-            Class<?> propertyType = _getter.getAnnotated().getReturnType();
+            Method _getter = property.getGetter().getAnnotated();
+            Class<?> propertyType = _getter.getReturnType();
             boolean isArray = propertyType.isArray();
             boolean isCollection = Collection.class.isAssignableFrom(propertyType);
             if(isArray) {
@@ -126,7 +125,7 @@ public class ViewTreeParser {
                     Class parent_model = driverMeta.view_bind_model.get(nodeClass);
                     Class child_model = driverMeta.view_bind_model.get(componentType);
                     if(child_model == null) {
-                        ViewTreeNode childNode = generateViewTreeNode(componentType, _getter.getAnnotated(),  0, node, true, __right);
+                        ViewTreeNode childNode = generateViewTreeNode(componentType, _getter,  0, node, true, __right);
                         child_nodes.add(childNode);
                         child_relations.put(childNode, true);
                     }
@@ -137,7 +136,7 @@ public class ViewTreeParser {
                             boolean outerIdGetterIsArray = outer_id_getter_return_type.isArray();
                             boolean outerIdGetterIsCollection = Collection.class.isAssignableFrom(outer_id_getter_return_type);
                             if(outerIdGetterIsArray || outerIdGetterIsCollection) {
-                                ViewTreeNode childNode = generateViewTreeNode(componentType, _getter.getAnnotated(), 0, node, false, __right);
+                                ViewTreeNode childNode = generateViewTreeNode(componentType, _getter, 0, node, false, __right);
                                 child_nodes.add(childNode);
                                 child_relations.put(childNode, false);
                             }
@@ -155,7 +154,7 @@ public class ViewTreeParser {
                                     logger.info("解析视图遇到无法处理情况，无法推算两者关系 父视图 = " + nodeClass.getName() + "，子视图 = " + componentType.getName());
                                 }
                                 else {
-                                    ViewTreeNode childNode = generateViewTreeNode(componentType, _getter.getAnnotated(), 0, node, true, __right);
+                                    ViewTreeNode childNode = generateViewTreeNode(componentType, _getter, 0, node, true, __right);
                                     child_nodes.add(childNode);
                                     child_relations.put(childNode, true);
                                 }
@@ -170,7 +169,7 @@ public class ViewTreeParser {
                     ViewDriverMetaData.ViewAndGetter viewAndGetter = new ViewDriverMetaData.ViewAndGetter(nodeClass, _getter.getName());
                     boolean isOuterAttribute = driverMeta.non_model_loader.containsKey(viewAndGetter);
                     if(isOuterAttribute) {
-                        ViewTreeNode childNode = generateViewTreeNode(componentType, _getter.getAnnotated(), 1, node, true, __right);
+                        ViewTreeNode childNode = generateViewTreeNode(componentType, _getter, 1, node, true, __right);
                         child_nodes.add(childNode);
                         child_relations.put(childNode, true);
                     }
@@ -178,7 +177,7 @@ public class ViewTreeParser {
             }
             else if(isCollection) {
                 Class elementType = Object.class;
-                Type genericReturnType = _getter.getAnnotated().getGenericReturnType();
+                Type genericReturnType = _getter.getGenericReturnType();
                 if(genericReturnType != null) {
                     String typeName = genericReturnType.getTypeName();
                     if(typeName != null && !"".equals(typeName)) {
@@ -196,7 +195,7 @@ public class ViewTreeParser {
                     Class parent_model = driverMeta.view_bind_model.get(nodeClass);
                     Class child_model = driverMeta.view_bind_model.get(elementType);
                     if(child_model == null) {
-                        ViewTreeNode childNode = generateViewTreeNode(elementType, _getter.getAnnotated(), 0, node, true, __right);
+                        ViewTreeNode childNode = generateViewTreeNode(elementType, _getter, 0, node, true, __right);
                         child_nodes.add(childNode);
                         child_relations.put(childNode, true);
                     }
@@ -207,7 +206,7 @@ public class ViewTreeParser {
                             boolean outerIdGetterIsArray = outer_id_getter_return_type.isArray();
                             boolean outerIdGetterIsCollection = Collection.class.isAssignableFrom(outer_id_getter_return_type);
                             if(outerIdGetterIsArray || outerIdGetterIsCollection) {
-                                ViewTreeNode childNode = generateViewTreeNode(elementType, _getter.getAnnotated(), 0, node, false, __right);
+                                ViewTreeNode childNode = generateViewTreeNode(elementType, _getter, 0, node, false, __right);
                                 child_nodes.add(childNode);
                                 child_relations.put(childNode, false);
                             }
@@ -225,7 +224,7 @@ public class ViewTreeParser {
                                     logger.info("解析视图遇到无法处理情况，无法推算两者关系 父视图 = " + nodeClass.getName() + "，子视图 = " + elementType.getName());
                                 }
                                 else {
-                                    ViewTreeNode childNode = generateViewTreeNode(elementType, _getter.getAnnotated(), 0, node, true, __right);
+                                    ViewTreeNode childNode = generateViewTreeNode(elementType, _getter, 0, node, true, __right);
                                     child_nodes.add(childNode);
                                     child_relations.put(childNode, true);
                                 }
@@ -240,7 +239,7 @@ public class ViewTreeParser {
                     ViewDriverMetaData.ViewAndGetter viewAndGetter = new ViewDriverMetaData.ViewAndGetter(nodeClass, _getter.getName());
                     boolean isOuterAttribute = driverMeta.non_model_loader.containsKey(viewAndGetter);
                     if(isOuterAttribute) {
-                        ViewTreeNode childNode = generateViewTreeNode(elementType, _getter.getAnnotated(), 1, node, true, __right);
+                        ViewTreeNode childNode = generateViewTreeNode(elementType, _getter, 1, node, true, __right);
                         child_nodes.add(childNode);
                         child_relations.put(childNode, true);
                     }
@@ -249,7 +248,7 @@ public class ViewTreeParser {
             else {
                 boolean isView = driverMeta.view_bind_model.containsKey(propertyType);
                 if(isView) {
-                    ViewTreeNode childNode = generateViewTreeNode(propertyType, _getter.getAnnotated(), 0, node, false, __right);
+                    ViewTreeNode childNode = generateViewTreeNode(propertyType, _getter, 0, node, false, __right);
                     child_nodes.add(childNode);
                     child_relations.put(childNode, false);
                 }
@@ -257,7 +256,7 @@ public class ViewTreeParser {
                     ViewDriverMetaData.ViewAndGetter viewAndGetter = new ViewDriverMetaData.ViewAndGetter(nodeClass, _getter.getName());
                     boolean isOuterAttribute = driverMeta.non_model_loader.containsKey(viewAndGetter);
                     if(isOuterAttribute) {
-                        ViewTreeNode childNode = generateViewTreeNode(propertyType, _getter.getAnnotated(), 1, node, false, __right);
+                        ViewTreeNode childNode = generateViewTreeNode(propertyType, _getter, 1, node, false, __right);
                         child_nodes.add(childNode);
                         child_relations.put(childNode, false);
                     }
@@ -267,11 +266,13 @@ public class ViewTreeParser {
 
         boolean is_depend_self = false;
         List<ViewTreeLine> to_child_lines = new ArrayList<>();
+        List<Method> depend_self_getters = new ArrayList<>();
         for (ViewTreeNode childNode : child_nodes) {
             to_child_lines.add(new ViewTreeLine(node, childNode, child_relations.get(childNode)));
 
             if (node == childNode) {
                 is_depend_self = true;
+                depend_self_getters.add(childNode.parentGetter);
             }
         }
         node.toChildLines = to_child_lines;
