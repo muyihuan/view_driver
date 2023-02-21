@@ -74,6 +74,7 @@ public class Demo {
                 .modelLoaderById(ModelB.class, (ids, context) -> modelBDomainService.batchGetModelBs(ids))
                 .modelLoaderById(ModelD.class, (ids, context) -> modelDDomainService.batchGetModelDs(ids))
                 .modelLoaderByOuterId(ModelC.class, ModelC::getModelAId, (ids, context) -> modelCDomainService.queryModelCList(ids, (Integer) context.get("page"), (Integer) context.get("count")))
+                .modelLoaderByOuterId(ModelC.class, ModelC::getModelAId, (ids, context) -> modelCDomainService.queryModelCList(ids, (Integer) context.get("page"), (Integer) context.get("count")), ViewA::getViewC2List)
                 .modelLoaderByOuterId(ModelE.class, ModelE::getModelAId, (ids, context) -> modelEDomainService.batchGetModelEs(ids))
                 .modelLoaderByOuterId(ModelF.class, ModelF::getModelBId, (ids, context) -> modelFDomainService.batchGetModelFs(ids))
                 .nonModelLoader(ViewA::getOuterAttributeAf, ModelA::getId, (ids, context) -> Collections.emptyMap())

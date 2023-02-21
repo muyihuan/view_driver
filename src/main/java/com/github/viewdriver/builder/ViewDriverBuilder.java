@@ -139,7 +139,7 @@ public class ViewDriverBuilder {
      * @param bindViewAttribute View的某属性 => View内可能存在多个属性通过同一个外键id加载model，但加载的方法是不同的.
      * @return ViewDriverBuilder
      */
-    public <M> ViewDriverBuilder modelLoaderByOuterId(Class<M> model, FieldGetter<M, Object> outerId, BiFunction<List, Context, Map<Object, List<M>>> loader, FieldGetter bindViewAttribute) {
+    public <M, V, C> ViewDriverBuilder modelLoaderByOuterId(Class<M> model, FieldGetter<M, Object> outerId, BiFunction<List, Context, Map<Object, List<M>>> loader, FieldGetter<V, C> bindViewAttribute) {
         driverMetaData.model_loader_by_outer_id_bind_field.put(new ViewDriverMetaData.ModelAndGetterAndField(model, outerId.getMethodName(), bindViewAttribute.getFieldName()), loader);
         return this;
     }
