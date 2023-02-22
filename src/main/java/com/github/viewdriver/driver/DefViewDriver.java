@@ -4,6 +4,7 @@ import com.github.viewdriver.Context;
 import com.github.viewdriver.ViewDriver;
 import com.github.viewdriver.driver.exception.MetaDataIsNullException;
 import com.github.viewdriver.driver.exception.NotViewException;
+import com.github.viewdriver.driver.exception.ParamIsNullException;
 import com.github.viewdriver.driver.executor.ConfusedExecutor;
 import com.github.viewdriver.driver.executor.IsolatedExecutor;
 import com.github.viewdriver.driver.metadata.ViewDriverMetaData;
@@ -12,7 +13,11 @@ import com.github.viewdriver.driver.tree.ViewTreeLine;
 import com.github.viewdriver.driver.tree.ViewTreeNode;
 import com.github.viewdriver.driver.tree.ViewTreeParser;
 import com.github.viewdriver.lambda.FieldGetter;
+import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.MethodInterceptor;
+import net.sf.cglib.proxy.MethodProxy;
 
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.function.BiFunction;
@@ -96,15 +101,29 @@ public class DefViewDriver implements ViewDriver {
             context = new Context();
         }
 
+        ViewTreeNode root_node = viewTree.getRoot();
+
         // model加载
         long timeout = config.driverConfig.getTimeout();
         ModelHouse model_house = new ModelHouse();
-        load_mode(viewTree.getRoot(), true, inputDataList, context, model_house);
+        load_mode(root_node, true, inputDataList, context, model_house);
 
         // view渲染
-        view_mapper(model_house);
+        List<V> views = new ArrayList<>();
+        for(Object model : model_house.getRootModelList()) {
+            if(model == null) {
+                continue;
+            }
 
-        return Collections.emptyList();
+            Object view = view_mapper(root_node, model, model_house);
+            if(view == null) {
+                continue;
+            }
+
+            views.add((V) view);
+        }
+
+        return views;
     }
 
     /**
@@ -130,6 +149,8 @@ public class DefViewDriver implements ViewDriver {
                         }
                     }
                 });
+
+                model_house.saveRootModelList(inputDataList);
             }
             else {
                 BiFunction model_loader = driverMeta.model_loader_by_id.get(model_class);
@@ -144,6 +165,12 @@ public class DefViewDriver implements ViewDriver {
                         }
                     }
                 });
+
+                List<Object> root_models = new ArrayList<>();
+                inputDataList.forEach(id -> {
+                    root_models.add(model_map.get(id));
+                });
+                model_house.saveRootModelList(root_models);
             }
         }
         else {
@@ -235,8 +262,30 @@ public class DefViewDriver implements ViewDriver {
     /**
      * view 渲染(通用动态代理实现视图渲染).
      */
-    private void view_mapper(ModelHouse model_house) {
+    private Object view_mapper(ViewTreeNode node, Object model, ModelHouse model_house) throws NotViewException {
+        if(node.getType() != 0) {
+            throw new NotViewException();
+        }
 
+        Map<String, Object> child_views = new HashMap<>();
+        List<ViewTreeNode> child_nodes = node.getChildNodes();
+        if(child_nodes != null && child_nodes.size() > 0) {
+            for(ViewTreeNode child_node : child_nodes) {
+                if(child_node.getType() == 0) {
+                    Object child_view = view_mapper(child_node, null, model_house);
+                    child_views.put(child_node.getParentGetter().getName(), child_view);
+                }
+                else if(child_node.getType() == 1) {
+
+                }
+            }
+        }
+
+        ViewMapper view_mapper = new ViewMapper();
+        view_mapper.view = node.getNodeClass();
+        view_mapper.model = model;
+        view_mapper.child_view_map = child_views;
+        return view_mapper.map();
     }
 
     /**
@@ -245,9 +294,28 @@ public class DefViewDriver implements ViewDriver {
      * @author yanghuan
      */
     private static class ModelHouse {
-        Map<Class, Map<Object, Object>> model_1 = new HashMap<>();
-        Map<Class, Map<Object, List<Object>>> model_n = new HashMap<>();
-        Map<Class, Map<Object, Object>> object_1 = new HashMap<>();
+        private List<Object> root_models = new ArrayList<>();
+        private Map<Class, Map<Object, Object>> model_1 = new HashMap<>();
+        private Map<Class, Map<Object, List<Object>>> model_n = new HashMap<>();
+        private Map<Class, Map<Object, Object>> object_1 = new HashMap<>();
+
+        /**
+         * 保存输入的model集合.
+         *
+         * @param root_models model集合.
+         */
+        private void saveRootModelList(List<Object> root_models) {
+            this.root_models = root_models;
+        }
+
+        /**
+         * 获取输入的model集合.
+         *
+         * @return model集合.
+         */
+        private List<Object> getRootModelList() {
+            return root_models;
+        }
 
         /**
          * 保存model.
@@ -311,9 +379,9 @@ public class DefViewDriver implements ViewDriver {
         private void saveModelList(Class modelClass, Object outerId, List<Object> models) {
             Map<Object, List<Object>> data = model_n.get(modelClass);
             if(data == null) {
-                model_1.put(modelClass, new HashMap<>());
+                model_n.put(modelClass, new HashMap<>());
 
-                saveModel(modelClass, outerId, models);
+                saveModelList(modelClass, outerId, models);
             }
             else {
                 data.put(outerId, models);
@@ -371,6 +439,38 @@ public class DefViewDriver implements ViewDriver {
             else {
                 return data.get(id);
             }
+        }
+    }
+
+    /**
+     * 通过CGLIB进行view的渲染.
+     *
+     * @author yanghuan
+     */
+    private static class ViewMapper<V> implements MethodInterceptor {
+        private Class<V> view;
+        private Object model;
+        private Map<String, Object> child_view_map;
+
+        /**
+         * 生成并获取渲染好的视图对象.
+         *
+         * @return 视图对象.
+         */
+        private Object map() {
+            if(view == null || model == null) {
+                throw new ParamIsNullException("view、model 不允许为空!");
+            }
+
+            Enhancer enhancer = new Enhancer();
+            enhancer.setSuperclass(view);
+            enhancer.setCallback(this);
+            return enhancer.create();
+        }
+
+        @Override
+        public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
+            return null;
         }
     }
 }

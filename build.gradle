@@ -22,6 +22,7 @@ dependencies {
     implementation('ch.qos.logback:logback-classic:1.1.8')
     // 视图树的解析依赖jackson
     implementation('com.fasterxml.jackson.core:jackson-databind:2.8.5')
+    implementation('cglib:cglib:3.1')
 
 
     // ...
