@@ -151,7 +151,7 @@ public class DefViewDriver implements ViewDriver {
             }
             else {
                 BiFunction model_loader = driverMeta.model_loader_by_id.get(model_class);
-                Map model_map = (Map) model_loader.apply(inputDataList, config);
+                Map model_map = (Map) model_loader.apply(inputDataList, context);
                 model_map.forEach((key, value) -> {
                     model_house.saveModel(model_class, key, value);
 
@@ -231,7 +231,7 @@ public class DefViewDriver implements ViewDriver {
                     }
                 }
                 else {
-                    FieldGetter id_getter = driverMeta.non_model_id_getter.get(parent_model_class);
+                    FieldGetter id_getter = driverMeta.non_model_id_getter.get(new ViewDriverMetaData.ViewAndGetter(parent_view_class, node.getParentGetter().getName()));
                     if(id_getter != null) {
                         List collect_ids = new ArrayList();
                         parent_models.forEach(model -> collect_ids.add(id_getter.apply(model)));
@@ -251,7 +251,8 @@ public class DefViewDriver implements ViewDriver {
         List<ViewTreeNode> nodes = node.getChildNodes();
         if(nodes != null && nodes.size() > 0) {
             for(ViewTreeNode _node : nodes) {
-                executor.execute(() -> load_mode(_node, false, inputDataList, context, model_house));
+//                executor.execute(() -> load_mode(_node, false, inputDataList, context, model_house));
+                load_mode(_node, false, inputDataList, context, model_house);
             }
         }
     }

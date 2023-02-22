@@ -1,6 +1,7 @@
 package com.github.viewdriver.driver.tree;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
@@ -12,7 +13,8 @@ import java.util.stream.Collectors;
  *
  * @author yanghuan
  */
-@Data
+@Setter
+@Getter
 public class ViewTreeNode {
 
     /**

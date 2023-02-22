@@ -1,11 +1,11 @@
 package com.github.case2.domain.modeld.model;
 
-import lombok.Getter;
+import lombok.Data;
 
 /**
  * @author yanghuan
  */
-@Getter
+@Data
 public class ModelD {
 
     /**

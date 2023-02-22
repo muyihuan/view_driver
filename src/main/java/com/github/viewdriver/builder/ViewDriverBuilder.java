@@ -90,7 +90,7 @@ public class ViewDriverBuilder {
         }
 
         idBindMap.forEach((idGetter, bindModel) -> {
-            if(bindModel.getName().equals(model.getName()) && driverMetaData.model_id_getter.get(model) != null) {
+            if(bindModel.getName().equals(model.getName()) && driverMetaData.model_id_getter.get(model) == null) {
                 driverMetaData.model_id_getter.put(model, idGetter);
             }
             else {

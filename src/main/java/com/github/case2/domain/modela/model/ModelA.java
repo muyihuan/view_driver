@@ -1,13 +1,13 @@
 package com.github.case2.domain.modela.model;
 
-import lombok.Getter;
+import lombok.Data;
 
 import java.util.List;
 
 /**
  * @author yanghuan
  */
-@Getter
+@Data
 public class ModelA {
 
     /**

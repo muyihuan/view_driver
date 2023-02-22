@@ -57,7 +57,7 @@ public class Demo {
                 .modelIdBind(ModelA.class, new IdBinder<ModelA>()
                         .bind(ModelA::getId, ModelA.class)
                         .bind(ModelA::getModelBId, ModelB.class)
-                        .bind(ModelA::getModelDIdList, ModelC.class))
+                        .bind(ModelA::getModelDIdList, ModelD.class))
                 .modelIdBind(ModelB.class, new IdBinder<ModelB>()
                         .bind(ModelB::getId, ModelB.class))
                 .modelIdBind(ModelC.class, new IdBinder<ModelC>()
@@ -91,7 +91,10 @@ public class Demo {
         List<ViewA> viewAList = defViewDriver.mapView(ids, ViewA.class, context);
 
         List<ModelB> modelBList = new ArrayList<>();
-        modelBList.add(new ModelB());
+        ModelB modelB = new ModelB();
+        modelB.setId(1L);
+        modelB.setInnerAttributeBa(new Object());
+        modelBList.add(modelB);
         List<ViewB> viewBList = defViewDriver.mapView(modelBList, ViewB.class, context);
     }
 }

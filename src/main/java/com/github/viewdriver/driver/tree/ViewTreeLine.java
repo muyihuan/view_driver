@@ -1,13 +1,15 @@
 package com.github.viewdriver.driver.tree;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 视图树节点之间的连线.
  *
  * @author yanghuan
  */
-@Data
+@Setter
+@Getter
 public class ViewTreeLine {
 
     ViewTreeNode left;

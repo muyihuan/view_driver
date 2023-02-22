@@ -2,7 +2,7 @@ package com.github.case2.domain.modele;
 
 import com.github.case2.domain.modele.model.ModelE;
 
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,7 +11,25 @@ import java.util.Map;
  */
 public class ModelEDomainService {
 
+    private static Map<Long, ModelE> modelE_db = new HashMap<>();
+    static {
+        ModelE modelE = new ModelE();
+        modelE.setModelAId(1L);
+        modelE.setInnerAttributeEa(new Object());
+        modelE.setInnerAttributeEb(new Object());
+
+        modelE_db.put(1L, modelE);
+    }
+
     public Map<Long, ModelE> batchGetModelEs(List<Long> modelAIds) {
-        return Collections.emptyMap();
+        if(modelAIds == null || modelAIds.size() == 0) {
+            return null;
+        }
+
+        Map<Long, ModelE> modelMap = new HashMap<>();
+        modelAIds.forEach(id -> {
+            modelMap.put(id, modelE_db.get(id));
+        });
+        return modelMap;
     }
 }
