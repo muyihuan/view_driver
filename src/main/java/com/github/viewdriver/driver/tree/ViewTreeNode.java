@@ -60,4 +60,21 @@ public class ViewTreeNode {
 
         return toChildLines.stream().map(line -> line.right).collect(Collectors.toList());
     }
+
+    /**
+     * 获取所有子节点.
+     */
+    public ViewTreeNode getChildNodeByGetter(String getterName) {
+        if(toChildLines == null || toChildLines.size() <= 0 || getterName == null) {
+            return null;
+        }
+
+        for(ViewTreeLine line : toChildLines) {
+            if(line.right.parentGetter.getName().equals(getterName)) {
+                return line.right;
+            }
+        }
+
+        return null;
+    }
 }

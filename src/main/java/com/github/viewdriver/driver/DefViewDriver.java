@@ -115,8 +115,7 @@ public class DefViewDriver implements ViewDriver {
         List<V> views = new ArrayList<>();
         model_house.getRootModelList().stream().filter(Objects::nonNull).forEach(model -> {
             try {
-                Object view = view_mapper(root_node, model, model_house);
-                views.add((V) view);
+                views.add((V) view_mapper(root_node, model, model_house));
             } catch (NotViewException ignore) {
             }
         });
@@ -280,8 +279,8 @@ public class DefViewDriver implements ViewDriver {
                     ViewTreeLine from_parent_line = child_node.getFromParentLine();
                     Class model_class = driverMeta.view_bind_model.get(node_class);
                     if(from_parent_line.is_one_to_n()) {
-                        Object _id = model_house.getIdByModel(model.getClass(), model);
-                        List<Object> model_list = model_house.getModelListByOuterId(model_class, _id);
+                        Object _parent_id = model_house.getIdByModel(model.getClass(), model);
+                        List<Object> model_list = model_house.getModelListByOuterId(model_class, _parent_id);
                         if(model_list != null && model_list.size() > 0) {
                             List<Object> _child_views = new ArrayList<>();
                             model_list.forEach(_model -> {
@@ -338,13 +337,17 @@ public class DefViewDriver implements ViewDriver {
                     }
                 }
                 else if(child_node.getType() == 1) {
-
+                    Object _parent_id = model_house.getIdByModel(model.getClass(), model);
+                    Object _child_object = model_house.getObjectById(node_class, _parent_id);
+                    if(_child_object != null) {
+                        child_views.put(child_node.getParentGetter().getName(), _child_object);
+                    }
                 }
             }
         }
 
         ViewMapper view_mapper = new ViewMapper();
-        view_mapper.view = node.getNodeClass();
+        view_mapper.node = node;
         view_mapper.model = model;
         view_mapper.child_view_map = child_views;
         return view_mapper.map();
@@ -530,9 +533,10 @@ public class DefViewDriver implements ViewDriver {
      * @author yanghuan
      */
     private static class ViewMapper<V> implements MethodInterceptor {
-        private Class<V> view;
+        private ViewTreeNode node;
         private Object model;
         private Map<String, Object> child_view_map;
+        private ViewDriverMetaData driverMeta;
 
         /**
          * 生成并获取渲染好的视图对象.
@@ -540,18 +544,51 @@ public class DefViewDriver implements ViewDriver {
          * @return 视图对象.
          */
         private Object map() {
-            if(view == null || model == null) {
-                throw new ParamIsNullException("view、model 不允许为空!");
+            if(node == null || model == null || driverMeta == null) {
+                throw new ParamIsNullException("node || model || driverMeta 不允许为空!");
             }
 
             Enhancer enhancer = new Enhancer();
-            enhancer.setSuperclass(view);
+            enhancer.setSuperclass(node.getNodeClass());
             enhancer.setCallback(this);
             return enhancer.create();
         }
 
         @Override
         public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
+            String method_name = method.getName();
+            ViewTreeNode _child_node = node.getChildNodeByGetter(method_name);
+            if(_child_node == null) {
+                return methodProxy.invoke(o, objects);
+            }
+
+            int type = _child_node.getType();
+            if(type == 0 || type == 1) {
+                return child_view_map.get(method_name);
+            }
+            else if(type == 2) {
+                ViewDriverMetaData.ViewAndGetter viewAndGetter = new ViewDriverMetaData.ViewAndGetter(node.getNodeClass(), method_name);
+                FieldGetter _bind_getter = driverMeta.field_getter_bind.get(viewAndGetter);
+                if(_bind_getter != null) {
+                    Object _model_value = _bind_getter.apply(method);
+                    if(_model_value != null) {
+                        Function _decorator = driverMeta.field_decorator.get(viewAndGetter);
+                        if(_decorator != null) {
+                            return _decorator.apply(_model_value);
+                        }
+                        else {
+                            return _model_value;
+                        }
+                    }
+                }
+                else {
+                    Method _model_getter = model.getClass().getMethod(method_name);
+                    if(_model_getter != null) {
+                        return _model_getter.invoke(method);
+                    }
+                }
+            }
+
             return null;
         }
     }
