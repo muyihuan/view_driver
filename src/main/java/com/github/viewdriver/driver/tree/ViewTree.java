@@ -24,11 +24,7 @@ public class ViewTree {
 
     private static final Logger logger = LoggerFactory.getLogger(ViewTree.class);
     private int max_dept;
-
-    /**
-     * 根节点.
-     */
-    ViewTreeNode rootNode;
+    ViewTreeNode root_node;
 
     /**
      * 获取树的根节点.
@@ -36,7 +32,7 @@ public class ViewTree {
      * @return 根节点.
      */
     public ViewTreeNode getRoot() {
-        return rootNode;
+        return root_node;
     }
 
     /**
@@ -54,7 +50,7 @@ public class ViewTree {
         }
 
         Queue<ViewTreeNode> curr_dept_nodes = new LinkedList<>();
-        curr_dept_nodes.offer(rootNode);
+        curr_dept_nodes.offer(root_node);
         int curr_dept = 1;
         while (curr_dept != dept) {
             int count = curr_dept_nodes.size();
@@ -87,8 +83,8 @@ public class ViewTree {
      *
      * @return true: 空、 false: 不为空.
      */
-    public boolean isNull() {
-        return rootNode == null;
+    public boolean isEmpty() {
+        return root_node == null;
     }
 
     /**
@@ -99,7 +95,7 @@ public class ViewTree {
             return;
         }
 
-        if(rootNode == null) {
+        if(root_node == null) {
             logger.debug("********************空*********************");
             return;
         }

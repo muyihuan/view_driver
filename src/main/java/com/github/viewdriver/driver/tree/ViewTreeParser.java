@@ -69,7 +69,7 @@ public class ViewTreeParser {
         viewTree = new ViewTree();
 
         Map<Class, ViewTreeNode> right = new HashMap<>();
-        viewTree.rootNode = generateViewTreeNode(rootView, null,  0, null, false, right);
+        viewTree.root_node = generateViewTreeNode(rootView, null,  0, null, false, right);
 
         view_tree_cache.put(rootView, viewTree);
 
@@ -173,6 +173,15 @@ public class ViewTreeParser {
                         child_nodes.add(childNode);
                         child_relations.put(childNode, true);
                     }
+                    else {
+                        ViewTreeNode childNode = new ViewTreeNode();
+                        childNode.type = 2;
+                        childNode.nodeClass = componentType;
+                        childNode.parentGetter = _getter;
+                        childNode.fromParentLine = new ViewTreeLine(node, childNode, false);
+                        child_nodes.add(childNode);
+                        child_relations.put(childNode, true);
+                    }
                 }
             }
             else if(isCollection) {
@@ -243,6 +252,15 @@ public class ViewTreeParser {
                         child_nodes.add(childNode);
                         child_relations.put(childNode, true);
                     }
+                    else {
+                        ViewTreeNode childNode = new ViewTreeNode();
+                        childNode.type = 2;
+                        childNode.nodeClass = elementType;
+                        childNode.parentGetter = _getter;
+                        childNode.fromParentLine = new ViewTreeLine(node, childNode, false);
+                        child_nodes.add(childNode);
+                        child_relations.put(childNode, true);
+                    }
                 }
             }
             else {
@@ -259,6 +277,15 @@ public class ViewTreeParser {
                         ViewTreeNode childNode = generateViewTreeNode(propertyType, _getter, 1, node, false, __right);
                         child_nodes.add(childNode);
                         child_relations.put(childNode, false);
+                    }
+                    else {
+                        ViewTreeNode childNode = new ViewTreeNode();
+                        childNode.type = 2;
+                        childNode.nodeClass = propertyType;
+                        childNode.parentGetter = _getter;
+                        childNode.fromParentLine = new ViewTreeLine(node, childNode, false);
+                        child_nodes.add(childNode);
+                        child_relations.put(childNode, true);
                     }
                 }
             }

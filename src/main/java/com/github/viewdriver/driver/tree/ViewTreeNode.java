@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class ViewTreeNode {
 
     /**
-     * 节点类型 0：视图、1：非视图
+     * 节点类型 0：视图、1：非视图&非基础属性、2：基础属性
      */
     int type;
 
