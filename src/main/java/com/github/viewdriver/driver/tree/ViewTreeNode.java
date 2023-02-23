@@ -22,16 +22,6 @@ public class ViewTreeNode {
     int type;
 
     /**
-     * 是否存在自己依赖自己
-     */
-    boolean isDependSelf;
-
-    /**
-     * 自己依赖自己的getter方法
-     */
-    List<Method> dependSelfGetters;
-
-    /**
      * 视图 或 非视图.
      */
     Class nodeClass;
@@ -64,6 +54,8 @@ public class ViewTreeNode {
 
     /**
      * 获取所有子节点.
+     *
+     * @param getterName getter方法.
      */
     public ViewTreeNode getChildNodeByGetter(String getterName) {
         if(toChildLines == null || toChildLines.size() <= 0 || getterName == null) {

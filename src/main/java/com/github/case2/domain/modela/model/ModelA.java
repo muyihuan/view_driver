@@ -25,7 +25,7 @@ public class ModelA {
     /**
      * 有依赖关系的 ModelA
      */
-    private ModelA dependentModelA;
+    private Long sourceModelAId;
 
     /**
      * ModelB的ID

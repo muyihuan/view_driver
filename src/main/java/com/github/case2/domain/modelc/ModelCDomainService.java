@@ -19,21 +19,21 @@ public class ModelCDomainService {
         modelC1.setId(1L);
         modelC1.setModelAId(1L);
         modelC1.setModelBId(1L);
-        modelC1.setDependentModelC(null);
+        modelC1.setSourceModelCId(null);
         modelCList.add(modelC1);
 
         ModelC modelC2 = new ModelC();
         modelC2.setId(2L);
         modelC2.setModelAId(1L);
         modelC2.setModelBId(2L);
-        modelC2.setDependentModelC(null);
+        modelC2.setSourceModelCId(null);
         modelCList.add(modelC2);
 
         ModelC modelC3 = new ModelC();
         modelC3.setId(3L);
         modelC3.setModelAId(1L);
         modelC3.setModelBId(3L);
-        modelC3.setDependentModelC(null);
+        modelC3.setSourceModelCId(null);
         modelCList.add(modelC3);
         modelC_list_db.put(1L, modelCList);
     }

@@ -2,7 +2,7 @@ package com.github.viewdriver.builder;
 
 import com.github.viewdriver.lambda.FieldGetter;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -12,7 +12,7 @@ import java.util.Map;
  */
 public class IdBinder<M> {
 
-    Map<FieldGetter<M, Object>, Class<?>> idBind = new HashMap<>();
+    Map<FieldGetter<M, Object>, Class<?>> idBind = new LinkedHashMap<>();
 
     /**
      * 绑定主键id和外键id对应的model.

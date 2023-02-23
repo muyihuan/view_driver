@@ -53,8 +53,8 @@ public class Case {
         // ViewA存在自己依赖自己所以也需要参与构建，大多数业务只有一层依赖，目前只支持一层依赖处理
         List<ModelA> copy = new ArrayList<>(modelAMap.values());
         modelAMap.values().forEach(modelA -> {
-            if(modelA.getDependentModelA() != null) {
-                copy.add(0, modelA.getDependentModelA());
+            if(modelA.getId() != null) {
+//                copy.add(0, modelA.getId());
             }
         });
 
@@ -135,23 +135,23 @@ public class Case {
                 viewB1.setViewF(viewF1);
                 viewC.setViewB(viewB1);
 
-                if(modelC.getDependentModelC() != null) {
-                    ViewC dependentViewC = new ViewC();
-                    dependentViewC.setViewCId(modelC.getDependentModelC().toString());
-
-                    ModelB modelB2 = modelBMap.get(modelC.getDependentModelC().getModelBId());
-                    ViewB viewB2 = new ViewB();
-                    viewB2.setViewBId(modelB2.getId().toString());
-                    viewB2.setInnerAttributeBa(modelB2.getInnerAttributeBa());
-                    ModelF modelF2 = modelFMap.get(modelB2.getId());
-                    ViewF viewF2 = new ViewF();
-                    viewF1.setInnerAttributeFa(modelF2.getInnerAttributeFa());
-                    viewF1.setInnerAttributeFb(modelF2.getInnerAttributeFb());
-                    viewB1.setViewF(viewF2);
-                    dependentViewC.setViewB(viewB2);
-                    dependentViewC.setDependentViewC(null);
-                    viewC.setDependentViewC(dependentViewC);
-                }
+//                if(modelC.getDependentModelC() != null) {
+//                    ViewC dependentViewC = new ViewC();
+//                    dependentViewC.setViewCId(modelC.getDependentModelC().toString());
+//
+//                    ModelB modelB2 = modelBMap.get(modelC.getDependentModelC().getModelBId());
+//                    ViewB viewB2 = new ViewB();
+//                    viewB2.setViewBId(modelB2.getId().toString());
+//                    viewB2.setInnerAttributeBa(modelB2.getInnerAttributeBa());
+//                    ModelF modelF2 = modelFMap.get(modelB2.getId());
+//                    ViewF viewF2 = new ViewF();
+//                    viewF1.setInnerAttributeFa(modelF2.getInnerAttributeFa());
+//                    viewF1.setInnerAttributeFb(modelF2.getInnerAttributeFb());
+//                    viewB1.setViewF(viewF2);
+//                    dependentViewC.setViewB(viewB2);
+//                    dependentViewC.setDependentViewC(null);
+//                    viewC.setDependentViewC(dependentViewC);
+//                }
 
                 viewCList.add(viewC);
             });
@@ -182,9 +182,9 @@ public class Case {
 
         List<ModelA> copy = new ArrayList<>(modelAs);
         modelAs.forEach(modelA -> {
-            if(modelA.getDependentModelA() != null) {
-                copy.add(0, modelA.getDependentModelA());
-            }
+//            if(modelA.getDependentModelA() != null) {
+//                copy.add(0, modelA.getDependentModelA());
+//            }
         });
 
         List<Long> modelAIds = copy.stream().map(ModelA::getId).collect(Collectors.toList());
@@ -264,23 +264,23 @@ public class Case {
                 viewB1.setViewF(viewF1);
                 viewC.setViewB(viewB1);
 
-                if(modelC.getDependentModelC() != null) {
-                    ViewC dependentViewC = new ViewC();
-                    dependentViewC.setViewCId(modelC.getDependentModelC().toString());
-
-                    ModelB modelB2 = modelBMap.get(modelC.getDependentModelC().getModelBId());
-                    ViewB viewB2 = new ViewB();
-                    viewB2.setViewBId(modelB2.getId().toString());
-                    viewB2.setInnerAttributeBa(modelB2.getInnerAttributeBa());
-                    ModelF modelF2 = modelFMap.get(modelB2.getId());
-                    ViewF viewF2 = new ViewF();
-                    viewF1.setInnerAttributeFa(modelF2.getInnerAttributeFa());
-                    viewF1.setInnerAttributeFb(modelF2.getInnerAttributeFb());
-                    viewB1.setViewF(viewF2);
-                    dependentViewC.setViewB(viewB2);
-                    dependentViewC.setDependentViewC(null);
-                    viewC.setDependentViewC(dependentViewC);
-                }
+//                if(modelC.getDependentModelC() != null) {
+//                    ViewC dependentViewC = new ViewC();
+//                    dependentViewC.setViewCId(modelC.getDependentModelC().toString());
+//
+//                    ModelB modelB2 = modelBMap.get(modelC.getDependentModelC().getModelBId());
+//                    ViewB viewB2 = new ViewB();
+//                    viewB2.setViewBId(modelB2.getId().toString());
+//                    viewB2.setInnerAttributeBa(modelB2.getInnerAttributeBa());
+//                    ModelF modelF2 = modelFMap.get(modelB2.getId());
+//                    ViewF viewF2 = new ViewF();
+//                    viewF1.setInnerAttributeFa(modelF2.getInnerAttributeFa());
+//                    viewF1.setInnerAttributeFb(modelF2.getInnerAttributeFb());
+//                    viewB1.setViewF(viewF2);
+//                    dependentViewC.setViewB(viewB2);
+//                    dependentViewC.setDependentViewC(null);
+//                    viewC.setDependentViewC(dependentViewC);
+//                }
 
                 viewCList.add(viewC);
             });

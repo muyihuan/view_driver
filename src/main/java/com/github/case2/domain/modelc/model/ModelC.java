@@ -28,5 +28,5 @@ public class ModelC {
     /**
      * 有依赖关系的 ModelC
      */
-    private ModelC dependentModelC;
+    private Long sourceModelCId;
 }

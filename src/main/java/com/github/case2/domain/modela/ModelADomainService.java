@@ -23,22 +23,21 @@ public class ModelADomainService {
         objectInfo.setOa("oa");
         objectInfo.setOb("ob");
         modelA.setInnerAttributeAa(objectInfo);
-        ModelA modelA2 = new ModelA();
-        {
-            modelA2.setId(2L);
-            ObjectInfo objectInfo2 = new ObjectInfo();
-            objectInfo2.setOa("oa1");
-            objectInfo2.setOb("ob1");
-            modelA2.setInnerAttributeAa(objectInfo2);
-            modelA2.setDependentModelA(null);
-            modelA2.setModelBId(null);
-            modelA2.setModelDIdList(null);
-        }
-        modelA.setDependentModelA(modelA2);
+        modelA.setSourceModelAId(2L);
         modelA.setModelBId(1L);
         modelA.setModelDIdList(Arrays.asList(1L, 2L, 3L));
-
         modelA_db.put(1L, modelA);
+
+        ModelA modelA2 = new ModelA();
+        modelA2.setId(2L);
+        ObjectInfo objectInfo2 = new ObjectInfo();
+        objectInfo2.setOa("oa1");
+        objectInfo2.setOb("ob1");
+        modelA2.setInnerAttributeAa(objectInfo2);
+        modelA2.setSourceModelAId(null);
+        modelA2.setModelBId(null);
+        modelA2.setModelDIdList(null);
+        modelA_db.put(2L, modelA2);
     }
 
     public Map<Long, ModelA> batchGetModelAs(List<Long> ids) {

@@ -3,6 +3,7 @@ package com.github.viewdriver;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.case2.domain.modela.ModelADomainService;
 import com.github.case2.domain.modela.model.ModelA;
+import com.github.case2.domain.modela.model.ObjectInfo;
 import com.github.case2.domain.modelb.ModelBDomainService;
 import com.github.case2.domain.modelb.model.ModelB;
 import com.github.case2.domain.modelc.ModelCDomainService;
@@ -20,6 +21,7 @@ import com.github.viewdriver.builder.ViewDriverBuilder;
 import com.github.viewdriver.driver.Config;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -57,13 +59,15 @@ public class Demo {
                 .modelIdBind(ModelA.class, new IdBinder<ModelA>()
                         .bind(ModelA::getId, ModelA.class)
                         .bind(ModelA::getModelBId, ModelB.class)
-                        .bind(ModelA::getModelDIdList, ModelD.class))
+                        .bind(ModelA::getModelDIdList, ModelD.class)
+                        .bind(ModelA::getSourceModelAId, ModelA.class))
                 .modelIdBind(ModelB.class, new IdBinder<ModelB>()
                         .bind(ModelB::getId, ModelB.class))
                 .modelIdBind(ModelC.class, new IdBinder<ModelC>()
                         .bind(ModelC::getId, ModelC.class)
                         .bind(ModelC::getModelAId, ModelA.class)
-                        .bind(ModelC::getModelBId, ModelB.class))
+                        .bind(ModelC::getModelBId, ModelB.class)
+                        .bind(ModelC::getSourceModelCId, ModelC.class))
                 .modelIdBind(ModelD.class, new IdBinder<ModelD>()
                         .bind(ModelD::getId, ModelD.class))
                 .modelIdBind(ModelE.class, new IdBinder<ModelE>()
@@ -86,11 +90,27 @@ public class Demo {
     public static void main(String[] args) throws Exception {
         Context context = new Context();
 
+        // 输入为id
         List<Long> ids = new ArrayList<>();
         ids.add(1L);
         List<ViewA> viewAList = defViewDriver.mapView(ids, ViewA.class, context);
+        System.out.println("ViewA视图 -> json");
+        System.out.println(new ObjectMapper().writeValueAsString(viewAList));
 
-        System.out.println("视图 -> json");
+        // 输入为model
+        List<ModelA> modelAList = new ArrayList<>();
+        ModelA modelA = new ModelA();
+        modelA.setId(1L);
+        ObjectInfo objectInfo = new ObjectInfo();
+        objectInfo.setOa("oa");
+        objectInfo.setOb("ob");
+        modelA.setInnerAttributeAa(objectInfo);
+        modelA.setSourceModelAId(2L);
+        modelA.setModelBId(1L);
+        modelA.setModelDIdList(Arrays.asList(1L, 2L, 3L));
+        modelAList.add(modelA);
+        viewAList = defViewDriver.mapView(modelAList, ViewA.class, context);
+        System.out.println("ViewA视图 -> json");
         System.out.println(new ObjectMapper().writeValueAsString(viewAList));
     }
 }

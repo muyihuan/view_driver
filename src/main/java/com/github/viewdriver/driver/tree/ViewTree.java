@@ -65,7 +65,6 @@ public class ViewTree {
                         curr_dept_nodes.offer(line.right);
                     });
                 }
-
                 count--;
             }
 
@@ -100,7 +99,31 @@ public class ViewTree {
             return;
         }
 
-        logger.debug("请查看视图树=> *********************************");
-        logger.debug("*********************************************");
+        logger.debug("start 可视化视图树 =>");
+        logger.debug("-------------------=>");
+        logger.debug("---------------------=>");
+        int curr_dept = 1;
+        while(curr_dept <= 20) {
+            List<ViewTreeNode> nodes = getDeptNodes(curr_dept);
+            if(nodes == null || nodes.size() == 0) {
+                break;
+            }
+
+            String views = "|  ";
+            for(int i = 0; i <  nodes.size(); i ++) {
+                if(nodes.get(i).getType() == 2) {
+                    continue;
+                }
+                if(i == (nodes.size() - 1)) {
+                    views += "<" + nodes.get(i).getNodeClass().getSimpleName() + ">" + "  |";
+                }
+                else {
+                    views += "<" + nodes.get(i).getNodeClass().getSimpleName() + ">" + "  |  ";
+                }
+            }
+            logger.debug("第" + curr_dept + "层 : " + views);
+            curr_dept ++;
+        }
+        logger.debug("可视化视图树 end");
     }
 }

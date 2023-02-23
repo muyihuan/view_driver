@@ -2,7 +2,7 @@ package com.github.viewdriver.builder;
 
 import com.github.viewdriver.lambda.FieldGetter;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -13,8 +13,8 @@ import java.util.function.Function;
  */
 public class FieldBinder<V, M> {
 
-    Map<FieldGetter, FieldGetter> fieldGetterBind = new HashMap<>();
-    Map<FieldGetter, Function> fieldDecorator = new HashMap<>();
+    Map<FieldGetter, FieldGetter> fieldGetterBind = new LinkedHashMap<>();
+    Map<FieldGetter, Function> fieldDecorator = new LinkedHashMap<>();
 
     /**
      * 属性映射.

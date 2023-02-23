@@ -266,7 +266,7 @@ public class ViewTreeParser {
                         childNode.saveParentGetter(node, _getter);
                         childNode.saveFromParentLine(node, _getter, new ViewTreeLine(node, childNode, false));
                         child_nodes.add(childNode);
-                        child_relations.put(childNode, true);
+                        child_relations.put(childNode, false);
                     }
                 }
             }
@@ -292,26 +292,22 @@ public class ViewTreeParser {
                         childNode.saveParentGetter(node, _getter);
                         childNode.saveFromParentLine(node, _getter, new ViewTreeLine(node, childNode, false));
                         child_nodes.add(childNode);
-                        child_relations.put(childNode, true);
+                        child_relations.put(childNode, false);
                     }
                 }
             }
         }
 
-        boolean is_depend_self = false;
         List<ViewTreeLine> to_child_lines = new ArrayList<>();
         List<Method> depend_self_getters = new ArrayList<>();
         for (ViewTreeNode childNode : child_nodes) {
             to_child_lines.add(new ViewTreeLine(node, childNode, child_relations.get(childNode)));
 
             if (node == childNode) {
-                is_depend_self = true;
                 depend_self_getters.addAll(childNode.parentGetter.get(node));
             }
         }
         node.toChildLines = to_child_lines;
-        node.isDependSelf = is_depend_self;
-
         return node;
     }
 
