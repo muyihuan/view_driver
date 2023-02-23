@@ -262,7 +262,8 @@ public class DefViewDriver implements ViewDriver {
             List<ViewTreeNode> nodes = node.getChildNodes();
             if(nodes != null && nodes.size() > 0) {
                 for(ViewTreeNode _node : nodes) {
-                    executor.execute(() -> load_mode(_node, node, false, inputDataList, context, model_house));
+//                    executor.execute(() -> load_mode(_node, node, false, inputDataList, context, model_house));
+                    load_mode(_node, node, false, inputDataList, context, model_house);
                 }
             }
         }

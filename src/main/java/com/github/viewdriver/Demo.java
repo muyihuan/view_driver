@@ -96,13 +96,17 @@ public class Demo {
         ids.add(1L);
         ids.add(2L);
         ids.add(3L);
-        List<ViewA> viewAList = defViewDriver.mapView(ids, ViewA.class, context);
-        System.out.println("ViewA视图 -> json");
-        System.out.println(new ObjectMapper().writeValueAsString(viewAList));
+        for(int i = 0; i < 1; i ++) {
+            long start = System.nanoTime();
+            List<ViewA> viewAList = defViewDriver.mapView(ids, ViewA.class, context);
+            System.out.println("time cost = " + (System.nanoTime() - start) / 1000000.0 + "ms");
+            System.out.println("ViewA视图 -> json");
+            System.out.println(new ObjectMapper().writeValueAsString(viewAList));
+        }
 
         // 输入为model
         List<ModelA> modelAList = modelADomainService.batchGetModelAs(Arrays.asList(1L, 2L)).values().stream().collect(Collectors.toList());
-        viewAList = defViewDriver.mapView(modelAList, ViewA.class, context);
+        List<ViewA> viewAList = defViewDriver.mapView(modelAList, ViewA.class, context);
         System.out.println("ViewA视图 -> json");
         System.out.println(new ObjectMapper().writeValueAsString(viewAList));
     }
