@@ -52,4 +52,17 @@ public class ModelADomainService {
         });
         return modelMap;
     }
+
+    public Map<Long, ObjectInfo> batchGetOuterObject(List<Long> ids) {
+        if(ids == null || ids.size() == 0) {
+            return null;
+        }
+
+        Map<Long, ObjectInfo> objectInfoMap = new HashMap<>();
+        ObjectInfo objectInfo = new ObjectInfo();
+        objectInfo.setOa("outerOa");
+        objectInfo.setOb("outerOb");
+        objectInfoMap.put(1L, objectInfo);
+        return objectInfoMap;
+    }
 }

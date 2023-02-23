@@ -20,7 +20,6 @@ import com.github.viewdriver.builder.ViewDriverBuilder;
 import com.github.viewdriver.driver.Config;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -78,7 +77,7 @@ public class Demo {
                 .modelLoaderByOuterId(ModelC.class, ModelC::getModelAId, (ids, context) -> modelCDomainService.queryModelC2List(ids, (Integer) context.get("page"), (Integer) context.get("count")), ViewA::getViewC2List)
                 .modelLoaderByOuterId(ModelE.class, ModelE::getModelAId, (ids, context) -> modelEDomainService.batchGetModelEs(ids))
                 .modelLoaderByOuterId(ModelF.class, ModelF::getModelBId, (ids, context) -> modelFDomainService.batchGetModelFs(ids))
-                .nonModelLoader(ViewA::getOuterAttributeAf, ModelA::getId, (ids, context) -> Collections.emptyMap())
+                .nonModelLoader(ViewA::getOuterAttributeAf, ModelA::getId, (ids, context) -> modelADomainService.batchGetOuterObject(ids))
                 .filter(ModelA.class, (modelA, context) -> modelA != null)
                 .config(new Config())
                 .build();

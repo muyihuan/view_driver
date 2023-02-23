@@ -26,8 +26,8 @@ public class ModelDDomainService {
         modelD3.setInnerAttributeDa("da3");
 
         modelD_db.put(1L, modelD1);
-        modelD_db.put(2L, modelD1);
-        modelD_db.put(3L, modelD1);
+        modelD_db.put(2L, modelD2);
+        modelD_db.put(3L, modelD3);
     }
 
     public Map<Long, ModelD> batchGetModelDs(List<Long> ids) {
