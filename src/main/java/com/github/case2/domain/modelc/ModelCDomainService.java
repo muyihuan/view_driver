@@ -2,10 +2,7 @@ package com.github.case2.domain.modelc;
 
 import com.github.case2.domain.modelc.model.ModelC;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * ModelC 领域
@@ -37,6 +34,7 @@ public class ModelCDomainService {
         modelC3.setSourceModelCId(null);
         modelCList.add(modelC3);
         modelC_list_db.put(1L, modelCList);
+        modelC_list_db.put(2L, Collections.singletonList(modelC2));
 
         modelC_db.put(1L, modelC1);
         modelC_db.put(2L, modelC2);

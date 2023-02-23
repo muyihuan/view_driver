@@ -47,7 +47,7 @@ public class Demo {
         // 构建全局视图驱动器
         defViewDriver = new ViewDriverBuilder()
                 .viewBindModel(ViewA.class, ModelA.class, new FieldBinder<ViewA, ModelA>()
-                        .bind(ViewA::getViewAId, ModelA::getId, String::valueOf))
+                        .bind(ViewA::getViewAId, ModelA::getId, (r) -> "自定义转化、脱敏、加密等"))
                 .viewBindModel(ViewB.class, ModelB.class, new FieldBinder<ViewB, ModelB>()
                         .bind(ViewB::getViewBId, ModelB::getId, String::valueOf))
                 .viewBindModel(ViewC.class, ModelC.class, new FieldBinder<ViewC, ModelC>()
@@ -94,6 +94,8 @@ public class Demo {
         // 输入为id
         List<Long> ids = new ArrayList<>();
         ids.add(1L);
+        ids.add(2L);
+        ids.add(3L);
         List<ViewA> viewAList = defViewDriver.mapView(ids, ViewA.class, context);
         System.out.println("ViewA视图 -> json");
         System.out.println(new ObjectMapper().writeValueAsString(viewAList));

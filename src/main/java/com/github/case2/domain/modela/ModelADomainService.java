@@ -36,7 +36,7 @@ public class ModelADomainService {
         modelA2.setInnerAttributeAa(objectInfo2);
         modelA2.setSourceModelAId(null);
         modelA2.setModelBId(null);
-        modelA2.setModelDIdList(null);
+        modelA2.setModelDIdList(Arrays.asList(2L));
         modelA_db.put(2L, modelA2);
     }
 

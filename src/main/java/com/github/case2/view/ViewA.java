@@ -62,4 +62,11 @@ public class ViewA {
      * 自己依赖自己类型
      */
     private ViewA dependentViewA;
+
+    /**
+     * 自定义数据
+     */
+    public String getCustom() {
+        return "自定义信息";
+    }
 }

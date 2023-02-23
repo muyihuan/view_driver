@@ -644,6 +644,7 @@ public class DefViewDriver implements ViewDriver {
                         }
                     }
                     catch (NoSuchMethodException ignore) {
+                        return methodProxy.invokeSuper(o, objects);
                     }
                 }
             }
