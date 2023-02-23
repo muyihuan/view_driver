@@ -1,11 +1,13 @@
 package com.github.case2.view;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author yanghuan
  */
-@Data
+@Getter
+@Setter
 public class ViewC {
 
     /**

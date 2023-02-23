@@ -1,12 +1,14 @@
 package com.github.case1.domain.feed.model.ugc;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 链接信息
  * @author edz
  */
-@Data
+@Getter
+@Setter
 public class LinkContentInfo {
 
     /**

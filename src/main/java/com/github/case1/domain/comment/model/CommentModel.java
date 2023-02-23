@@ -1,12 +1,14 @@
 package com.github.case1.domain.comment.model;
 
 import com.github.case1.domain.feed.model.ugc.ImageContentInfo;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author yanghuan
  */
-@Data
+@Getter
+@Setter
 public class CommentModel {
 
     /**

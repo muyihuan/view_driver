@@ -1,12 +1,14 @@
 package com.github.case1.domain.user.model;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 用户社交状态信息
  * @author yanghuan
  */
-@Data
+@Getter
+@Setter
 public class UserSocialStatusInfo {
 
     /**

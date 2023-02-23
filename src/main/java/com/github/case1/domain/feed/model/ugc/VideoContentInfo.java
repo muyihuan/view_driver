@@ -1,12 +1,14 @@
 package com.github.case1.domain.feed.model.ugc;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 奖牌信息
  * @author edz
  */
-@Data
+@Getter
+@Setter
 public class VideoContentInfo {
 
     /**

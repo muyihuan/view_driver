@@ -1,12 +1,14 @@
 package com.github.case1.view;
 
 import com.github.case1.view.ugc.ImageView;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 评论
  */
-@Data
+@Getter
+@Setter
 public class CommentView {
 
     /**

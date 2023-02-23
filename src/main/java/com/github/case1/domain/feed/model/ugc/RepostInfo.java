@@ -1,13 +1,15 @@
 package com.github.case1.domain.feed.model.ugc;
 
 import com.github.case1.domain.feed.model.FeedModel;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 转发更全面的信息
  * @author yanghuan
  */
-@Data
+@Getter
+@Setter
 public class RepostInfo {
 
     /**

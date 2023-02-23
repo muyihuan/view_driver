@@ -1,13 +1,15 @@
 package com.github.case1.view;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author ytm
  * @createtime 2021-7-12
  * @description feed流用户状态引流位信息
  */
-@Data
+@Getter
+@Setter
 public class UserStatusDrainageView {
 
     /**

@@ -1,12 +1,14 @@
 package com.github.case1.domain.feed.model.ugc;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 文本内容模型
  * @author yanghuan
  */
-@Data
+@Getter
+@Setter
 public class TextContentInfo {
 
     /**

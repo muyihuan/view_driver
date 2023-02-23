@@ -1,11 +1,13 @@
 package com.github.case1.view.ugc;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 图片信息
  */
-@Data
+@Getter
+@Setter
 public class ImageView {
 
     /**

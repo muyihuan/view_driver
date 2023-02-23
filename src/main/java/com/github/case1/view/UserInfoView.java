@@ -1,12 +1,14 @@
 package com.github.case1.view;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 作者相关信息
  * @author yanghuan
  */
-@Data
+@Getter
+@Setter
 public class UserInfoView {
 
     /**

@@ -15,8 +15,8 @@ public class ModelFDomainService {
     static {
         ModelF modelF = new ModelF();
         modelF.setModelBId(1L);
-        modelF.setInnerAttributeFa(new Object());
-        modelF.setInnerAttributeFb(new Object());
+        modelF.setInnerAttributeFa("fa");
+        modelF.setInnerAttributeFb("fb");
 
         modelF_db.put(1L, modelF);
     }

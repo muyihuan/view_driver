@@ -4,14 +4,16 @@ import com.github.case1.domain.feed.model.property.AtInfo;
 import com.github.case1.view.ugc.AudioView;
 import com.github.case1.view.ugc.ImageView;
 import com.github.case1.view.ugc.VideoView;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
 /**
  * @author yanghuan
  */
-@Data
+@Getter
+@Setter
 public class FeedView {
 
     /**

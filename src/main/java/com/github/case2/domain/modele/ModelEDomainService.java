@@ -15,8 +15,8 @@ public class ModelEDomainService {
     static {
         ModelE modelE = new ModelE();
         modelE.setModelAId(1L);
-        modelE.setInnerAttributeEa(new Object());
-        modelE.setInnerAttributeEb(new Object());
+        modelE.setInnerAttributeEa("ea");
+        modelE.setInnerAttributeEb("eb");
 
         modelE_db.put(1L, modelE);
     }

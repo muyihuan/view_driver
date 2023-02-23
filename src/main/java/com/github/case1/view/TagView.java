@@ -1,11 +1,13 @@
 package com.github.case1.view;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 话题信息
  */
-@Data
+@Getter
+@Setter
 public class TagView {
 
     /**

@@ -1,6 +1,7 @@
 package com.github.viewdriver.driver;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 视图驱动器配置.
@@ -59,7 +60,8 @@ public class Config {
      *
      * @author yanghuan
      */
-    @Data
+    @Getter
+    @Setter
     public static class ExecutorConfig {
 
         /**
@@ -98,7 +100,8 @@ public class Config {
      *
      * @author yanghuan
      */
-    @Data
+    @Getter
+    @Setter
     public static class DriverConfig {
 
         /**

@@ -23,6 +23,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 默认视图驱动器.
@@ -113,13 +114,9 @@ public class DefViewDriver implements ViewDriver {
         Thread.sleep(timeout);
 
         // view渲染
-        List<V> views = new ArrayList<>();
-        model_house.getRootModelList().stream().filter(Objects::nonNull).forEach(model -> {
-            try {
-                views.add((V) view_mapper(root_node, model, model_house));
-            } catch (NotViewException ignore) {
-            }
-        });
+        List<V> views = model_house.getRootModelList().stream()
+                .filter(Objects::nonNull)
+                .map(model -> (V) view_mapper(root_node, model, model_house)).collect(Collectors.toList());
 
         return views;
     }
@@ -298,50 +295,47 @@ public class DefViewDriver implements ViewDriver {
      * @return 视图对象.
      * @throws NotViewException 接收到一个非视图.
      */
-    private Object view_mapper(ViewTreeNode node, Object model, ModelHouse model_house) throws NotViewException {
+    private Object view_mapper(ViewTreeNode node, Object model, ModelHouse model_house) {
         if(node.getType() != 0) {
-            throw new NotViewException();
+            return null;
         }
 
         Map<String, Object> child_views = new HashMap<>();
         List<ViewTreeNode> child_nodes = node.getChildNodes();
         if(child_nodes != null && child_nodes.size() > 0) {
             for(ViewTreeNode child_node : child_nodes) {
-                Class node_class = child_node.getNodeClass();
+                Class child_node_class = child_node.getNodeClass();
+                Class child_model_class = driverMeta.view_bind_model.get(child_node_class);
                 Map<Method, ViewTreeLine> from_parent_line_with_getter = child_node.getFromParentLine().get(node);
                 for(Map.Entry<Method, ViewTreeLine> entry : from_parent_line_with_getter.entrySet()) {
                     Method _parent_getter = entry.getKey();
                     ViewTreeLine from_parent_line = entry.getValue();
 
                     if(child_node.getType() == 0) {
-                        Class model_class = driverMeta.view_bind_model.get(node_class);
                         if(from_parent_line.is_one_to_n()) {
                             Object _parent_id = model_house.getIdByModel(model.getClass(), model);
-                            List<Object> model_list = model_house.getModelListByOuterId(model_class, _parent_id);
+                            List<Object> model_list = model_house.getModelListByOuterId(child_model_class, _parent_id);
                             if(model_list != null && model_list.size() > 0) {
                                 List<Object> _child_views = new ArrayList<>();
                                 model_list.forEach(_model -> {
-                                    try {
-                                        Object _child_view = view_mapper(child_node, _model, model_house);
-                                        _child_views.add(_child_view);
-                                    } catch (NotViewException ignore) {
-                                    }
+                                    Object _child_view = view_mapper(child_node, _model, model_house);
+                                    _child_views.add(_child_view);
                                 });
                                 child_views.put(_parent_getter.getName(), _child_views);
                             }
                         }
                         else {
-                            FieldGetter outer_id_getter = driverMeta.model_relation_by_outer_id.get(new ViewDriverMetaData.TwoModel(model.getClass(), node_class));
+                            FieldGetter outer_id_getter = driverMeta.model_relation_by_outer_id.get(new ViewDriverMetaData.TwoModel(model.getClass(), child_model_class));
                             if(outer_id_getter != null) {
                                 Class outer_id_getter_return_type = outer_id_getter.getReturnType();
                                 boolean outerIdGetterIsArray = outer_id_getter_return_type.isArray();
                                 boolean outerIdGetterIsCollection = Collection.class.isAssignableFrom(outer_id_getter_return_type);
-                                if(outerIdGetterIsArray || outerIdGetterIsCollection) {
+                                if(outerIdGetterIsArray) {
                                     Object[] _ids = (Object[]) outer_id_getter.apply(model);
                                     if(_ids != null && _ids.length > 0) {
                                         List<Object> _child_views = new ArrayList<>();
                                         for(Object _id : _ids) {
-                                            Object _model = model_house.getModelById(node_class, _id);
+                                            Object _model = model_house.getModelById(child_model_class, _id);
                                             if(_model != null) {
                                                 Object _child_view = view_mapper(child_node, _model, model_house);
                                                 _child_views.add(_child_view);
@@ -355,7 +349,7 @@ public class DefViewDriver implements ViewDriver {
                                     if(_ids != null && _ids.size() > 0) {
                                         List<Object> _child_views = new ArrayList<>();
                                         for(Object _id : _ids) {
-                                            Object _model = model_house.getModelById(node_class, _id);
+                                            Object _model = model_house.getModelById(child_model_class, _id);
                                             if(_model != null) {
                                                 Object _child_view = view_mapper(child_node, _model, model_house);
                                                 _child_views.add(_child_view);
@@ -366,7 +360,7 @@ public class DefViewDriver implements ViewDriver {
                                 }
                                 else {
                                     Object _id = outer_id_getter.apply(model);
-                                    Object _model = model_house.getModelById(node_class, _id);
+                                    Object _model = model_house.getModelById(child_model_class, _id);
                                     if(_model != null) {
                                         Object _child_view = view_mapper(child_node, _model, model_house);
                                         child_views.put(_parent_getter.getName(), _child_view);
@@ -377,7 +371,7 @@ public class DefViewDriver implements ViewDriver {
                     }
                     else if(child_node.getType() == 1) {
                         Object _parent_id = model_house.getIdByModel(model.getClass(), model);
-                        Object _child_object = model_house.getObjectById(node_class, _parent_id);
+                        Object _child_object = model_house.getObjectById(child_model_class, _parent_id);
                         if(_child_object != null) {
                             child_views.put(_parent_getter.getName(), _child_object);
                         }
@@ -451,36 +445,36 @@ public class DefViewDriver implements ViewDriver {
         }
 
         /**
-         * 通过model获取model的ID.
-         *
-         * @param modelClass model类型.
-         * @param model model.
-         * @return model的ID.
-         */
-        private Object getModelById(Class modelClass, Object model) {
-            Map<Object, Object> data = model_id_1.get(modelClass);
-            if(data == null) {
-                return null;
-            }
-            else {
-                return data.get(model);
-            }
-        }
-
-        /**
          * 通过ID获取某类型的所有model.
          *
          * @param modelClass model类型.
          * @param id model的ID.
          * @return model.
          */
-        private Object getIdByModel(Class modelClass, Object id) {
+        private Object getModelById(Class modelClass, Object id) {
             Map<Object, Object> data = id_model_1.get(modelClass);
             if(data == null) {
                 return null;
             }
             else {
                 return data.get(id);
+            }
+        }
+
+        /**
+         * 通过model获取model的ID.
+         *
+         * @param modelClass model类型.
+         * @param model model.
+         * @return model的ID.
+         */
+        private Object getIdByModel(Class modelClass, Object model) {
+            Map<Object, Object> data = model_id_1.get(modelClass);
+            if(data == null) {
+                return null;
+            }
+            else {
+                return data.get(model);
             }
         }
 

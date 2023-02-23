@@ -1,12 +1,14 @@
 package com.github.case1.domain.feed.model.property;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 艾特信息
  * @author edz
  */
-@Data
+@Getter
+@Setter
 public class AtInfo {
 
     /**

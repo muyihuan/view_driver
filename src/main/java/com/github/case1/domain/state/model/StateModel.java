@@ -1,11 +1,13 @@
 package com.github.case1.domain.state.model;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author yanghuan
  */
-@Data
+@Getter
+@Setter
 public class StateModel {
 
     /**

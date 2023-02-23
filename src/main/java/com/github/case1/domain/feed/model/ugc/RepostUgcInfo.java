@@ -1,6 +1,7 @@
 package com.github.case1.domain.feed.model.ugc;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.LinkedList;
 
@@ -8,7 +9,8 @@ import java.util.LinkedList;
  * 转发UGC
  * @author yanghuan
  */
-@Data
+@Getter
+@Setter
 public class RepostUgcInfo {
 
     /**

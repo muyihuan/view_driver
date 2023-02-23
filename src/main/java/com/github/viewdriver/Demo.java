@@ -90,14 +90,8 @@ public class Demo {
         List<Long> ids = new ArrayList<>();
         ids.add(1L);
         List<ViewA> viewAList = defViewDriver.mapView(ids, ViewA.class, context);
-        System.out.println(new ObjectMapper().writeValueAsString(viewAList));
 
-//        List<ModelB> modelBList = new ArrayList<>();
-//        ModelB modelB = new ModelB();
-//        modelB.setId(1L);
-//        modelB.setInnerAttributeBa(new Object());
-//        modelBList.add(modelB);
-//        List<ViewB> viewBList = defViewDriver.mapView(modelBList, ViewB.class, context);
-//        System.out.println(new ObjectMapper().writeValueAsString(viewBList));
+        System.out.println("视图 -> json");
+        System.out.println(new ObjectMapper().writeValueAsString(viewAList));
     }
 }

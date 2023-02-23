@@ -1,20 +1,22 @@
 package com.github.case2.view;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author yanghuan
  */
-@Data
+@Getter
+@Setter
 public class ViewF {
 
     /**
      * 基础属性 fa
      */
-    private Object innerAttributeFa;
+    private String innerAttributeFa;
 
     /**
      * 基础属性 fb
      */
-    private Object innerAttributeFb;
+    private String innerAttributeFb;
 }

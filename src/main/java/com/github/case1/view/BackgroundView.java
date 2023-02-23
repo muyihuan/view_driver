@@ -1,12 +1,14 @@
 package com.github.case1.view;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * feed背景图信息
  * @author yanghuan
  */
-@Data
+@Getter
+@Setter
 public class BackgroundView {
 
     /**

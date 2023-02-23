@@ -1,11 +1,13 @@
 package com.github.case2.view;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author yanghuan
  */
-@Data
+@Getter
+@Setter
 public class ViewB {
 
     /**
@@ -16,7 +18,7 @@ public class ViewB {
     /**
      * 基础属性 ba
      */
-    private Object innerAttributeBa;
+    private String innerAttributeBa;
 
     /**
      * View类型 不是通过 View id 查的

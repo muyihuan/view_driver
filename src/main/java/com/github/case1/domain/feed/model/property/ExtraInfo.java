@@ -1,12 +1,14 @@
 package com.github.case1.domain.feed.model.property;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 扩展信息
  * @author yanghuan
  */
-@Data
+@Getter
+@Setter
 public class ExtraInfo {
 
     /**

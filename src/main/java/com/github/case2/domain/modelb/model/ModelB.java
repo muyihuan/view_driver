@@ -1,11 +1,13 @@
 package com.github.case2.domain.modelb.model;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author yanghuan
  */
-@Data
+@Getter
+@Setter
 public class ModelB {
 
     /**
@@ -16,5 +18,5 @@ public class ModelB {
     /**
      * 基础属性 ba
      */
-    private Object innerAttributeBa;
+    private String innerAttributeBa;
 }

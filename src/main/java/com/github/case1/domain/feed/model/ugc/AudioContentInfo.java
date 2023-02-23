@@ -1,12 +1,14 @@
 package com.github.case1.domain.feed.model.ugc;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 音频信息
  * @author wangsch
  */
-@Data
+@Getter
+@Setter
 public class AudioContentInfo {
 
     /**
