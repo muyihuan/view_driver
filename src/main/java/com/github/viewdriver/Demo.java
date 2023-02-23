@@ -3,7 +3,6 @@ package com.github.viewdriver;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.case2.domain.modela.ModelADomainService;
 import com.github.case2.domain.modela.model.ModelA;
-import com.github.case2.domain.modela.model.ObjectInfo;
 import com.github.case2.domain.modelb.ModelBDomainService;
 import com.github.case2.domain.modelb.model.ModelB;
 import com.github.case2.domain.modelc.ModelCDomainService;
@@ -23,6 +22,7 @@ import com.github.viewdriver.driver.Config;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 使用示例.
@@ -101,17 +101,7 @@ public class Demo {
         System.out.println(new ObjectMapper().writeValueAsString(viewAList));
 
         // 输入为model
-        List<ModelA> modelAList = new ArrayList<>();
-        ModelA modelA = new ModelA();
-        modelA.setId(1L);
-        ObjectInfo objectInfo = new ObjectInfo();
-        objectInfo.setOa("oa");
-        objectInfo.setOb("ob");
-        modelA.setInnerAttributeAa(objectInfo);
-        modelA.setSourceModelAId(2L);
-        modelA.setModelBId(1L);
-        modelA.setModelDIdList(Arrays.asList(1L, 2L, 3L));
-        modelAList.add(modelA);
+        List<ModelA> modelAList = modelADomainService.batchGetModelAs(Arrays.asList(1L, 2L)).values().stream().collect(Collectors.toList());
         viewAList = defViewDriver.mapView(modelAList, ViewA.class, context);
         System.out.println("ViewA视图 -> json");
         System.out.println(new ObjectMapper().writeValueAsString(viewAList));

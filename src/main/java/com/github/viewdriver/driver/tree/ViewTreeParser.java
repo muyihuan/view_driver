@@ -299,13 +299,8 @@ public class ViewTreeParser {
         }
 
         List<ViewTreeLine> to_child_lines = new ArrayList<>();
-        List<Method> depend_self_getters = new ArrayList<>();
         for (ViewTreeNode childNode : child_nodes) {
             to_child_lines.add(new ViewTreeLine(node, childNode, child_relations.get(childNode)));
-
-            if (node == childNode) {
-                depend_self_getters.addAll(childNode.parentGetter.get(node));
-            }
         }
         node.toChildLines = to_child_lines;
         return node;

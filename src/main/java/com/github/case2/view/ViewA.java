@@ -69,4 +69,11 @@ public class ViewA {
     public String getCustom() {
         return "自定义信息";
     }
+
+    /**
+     * 自定义数据2
+     */
+    public String getCustom2() {
+        return "ViewB的数据: " + (getViewB() == null ? "null" : getViewB().getInnerAttributeBa());
+    }
 }

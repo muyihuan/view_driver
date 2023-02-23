@@ -63,7 +63,7 @@ public class DefViewDriver implements ViewDriver {
 
         if(this.config == null) {
             this.config = new Config();
-            this.config.setTimeout(1000);
+            this.config.setTimeout(3000);
         }
 
         if(this.driverMeta != null) {
@@ -262,14 +262,11 @@ public class DefViewDriver implements ViewDriver {
             List<ViewTreeNode> nodes = node.getChildNodes();
             if(nodes != null && nodes.size() > 0) {
                 for(ViewTreeNode _node : nodes) {
-                     // 方便测试 executor.execute(() -> load_mode(_node, false, inputDataList, context, model_house));
-                    load_mode(_node, node, false, inputDataList, context, model_house);
+                    executor.execute(() -> load_mode(_node, node, false, inputDataList, context, model_house));
                 }
             }
         }
     }
-
-    private static int i = 0;
 
     /**
      * view 渲染(通用动态代理实现视图渲染).
@@ -278,7 +275,6 @@ public class DefViewDriver implements ViewDriver {
      * @param model model.
      * @param model_house 已加载的所有model.
      * @return 视图对象.
-     * @throws NotViewException 接收到一个非视图.
      */
     private Object view_mapper(ViewTreeNode node, Object model, ModelHouse model_house) {
         if(node.getType() != 0) {
@@ -614,7 +610,7 @@ public class DefViewDriver implements ViewDriver {
             String method_name = method.getName();
             ViewTreeNode _child_node = node.getChildNodeByGetter(method_name);
             if(_child_node == null) {
-                return methodProxy.invoke(o, objects);
+                return methodProxy.invokeSuper(o, objects);
             }
 
             int type = _child_node.getType();
