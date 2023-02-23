@@ -96,15 +96,22 @@ public class ViewTreeParser {
 
         // 已经进入解析状态的不需要再构建，防止循环依赖.
         if(__right.get(nodeClass) != null) {
-            return __right.get(nodeClass);
+            ViewTreeNode node = __right.get(nodeClass);
+            if(parent != null) {
+                if(getter != null) {
+                    node.saveParentGetter(parent, getter);
+                }
+                node.saveFromParentLine(parent, getter, new ViewTreeLine(parent, node, isOneToN));
+            }
+            return node;
         }
 
         ViewTreeNode node = new ViewTreeNode();
         node.type = type;
         node.nodeClass = nodeClass;
-        node.parentGetter = getter;
         if(parent != null) {
-            node.fromParentLine = new ViewTreeLine(parent, node, isOneToN);
+            node.saveParentGetter(parent, getter);
+            node.saveFromParentLine(parent, getter, new ViewTreeLine(parent, node, isOneToN));
         }
 
         // 进入解析状态.
@@ -177,8 +184,8 @@ public class ViewTreeParser {
                         ViewTreeNode childNode = new ViewTreeNode();
                         childNode.type = 2;
                         childNode.nodeClass = componentType;
-                        childNode.parentGetter = _getter;
-                        childNode.fromParentLine = new ViewTreeLine(node, childNode, false);
+                        childNode.saveParentGetter(node, _getter);
+                        childNode.saveFromParentLine(node, _getter, new ViewTreeLine(node, childNode, false));
                         child_nodes.add(childNode);
                         child_relations.put(childNode, true);
                     }
@@ -256,8 +263,8 @@ public class ViewTreeParser {
                         ViewTreeNode childNode = new ViewTreeNode();
                         childNode.type = 2;
                         childNode.nodeClass = elementType;
-                        childNode.parentGetter = _getter;
-                        childNode.fromParentLine = new ViewTreeLine(node, childNode, false);
+                        childNode.saveParentGetter(node, _getter);
+                        childNode.saveFromParentLine(node, _getter, new ViewTreeLine(node, childNode, false));
                         child_nodes.add(childNode);
                         child_relations.put(childNode, true);
                     }
@@ -282,8 +289,8 @@ public class ViewTreeParser {
                         ViewTreeNode childNode = new ViewTreeNode();
                         childNode.type = 2;
                         childNode.nodeClass = propertyType;
-                        childNode.parentGetter = _getter;
-                        childNode.fromParentLine = new ViewTreeLine(node, childNode, false);
+                        childNode.saveParentGetter(node, _getter);
+                        childNode.saveFromParentLine(node, _getter, new ViewTreeLine(node, childNode, false));
                         child_nodes.add(childNode);
                         child_relations.put(childNode, true);
                     }
@@ -299,7 +306,7 @@ public class ViewTreeParser {
 
             if (node == childNode) {
                 is_depend_self = true;
-                depend_self_getters.add(childNode.parentGetter);
+                depend_self_getters.addAll(childNode.parentGetter.get(node));
             }
         }
         node.toChildLines = to_child_lines;

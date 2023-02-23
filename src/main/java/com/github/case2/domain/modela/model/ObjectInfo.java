@@ -11,10 +11,10 @@ public class ObjectInfo {
     /**
      * 属性 oa
      */
-    private Object oa;
+    private String oa;
 
     /**
      * 属性 ob
      */
-    private Object ob;
+    private String ob;
 }

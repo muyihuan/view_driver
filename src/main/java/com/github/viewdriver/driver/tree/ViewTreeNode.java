@@ -4,8 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -40,12 +39,12 @@ public class ViewTreeNode {
     /**
      * 对应的getter方法
      */
-    Method parentGetter;
+    Map<ViewTreeNode, List<Method>> parentGetter = new HashMap<>();
 
     /**
      * 父节点连向自己的连线.
      */
-    ViewTreeLine fromParentLine;
+    Map<ViewTreeNode, Map<Method, ViewTreeLine>> fromParentLine = new HashMap<>();
 
     /**
      * 连向的子节点的连线.
@@ -72,11 +71,52 @@ public class ViewTreeNode {
         }
 
         for(ViewTreeLine line : toChildLines) {
-            if(line.right.parentGetter.getName().equals(getterName)) {
-                return line.right;
+            List<Method> methods = line.right.parentGetter.get(this);
+            if(methods != null && methods.size() > 0) {
+                for(Method method : methods) {
+                    if(method.getName().equals(getterName)) {
+                        return line.right;
+                    }
+                }
             }
         }
 
         return null;
+    }
+
+    /**
+     * 保存来自父节点对应的getter.
+     *
+     * @param parent_node 父节点.
+     * @param method getter方法.
+     */
+    public void saveParentGetter(ViewTreeNode parent_node, Method method) {
+        List<Method> methods = parentGetter.get(parent_node);
+        if(methods == null) {
+            parentGetter.put(parent_node, new ArrayList<>());
+
+            saveParentGetter(parent_node, method);
+        }
+        else {
+            methods.add(method);
+        }
+    }
+
+    /**
+     * 保存来自父节点对应的getter.
+     *
+     * @param parent_node 父节点.
+     * @param getter getter方法.
+     */
+    public void saveFromParentLine(ViewTreeNode parent_node, Method getter, ViewTreeLine line) {
+        Map<Method, ViewTreeLine> method_line = fromParentLine.get(parent_node);
+        if(method_line == null) {
+            fromParentLine.put(parent_node, new HashMap<>());
+
+            saveFromParentLine(parent_node, getter, line);
+        }
+        else {
+            method_line.put(getter, line);
+        }
     }
 }

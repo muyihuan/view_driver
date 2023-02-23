@@ -20,15 +20,15 @@ public class ModelADomainService {
         ModelA modelA = new ModelA();
         modelA.setId(1L);
         ObjectInfo objectInfo = new ObjectInfo();
-        objectInfo.setOa(new Object());
-        objectInfo.setOb(new Object());
+        objectInfo.setOa("oa");
+        objectInfo.setOb("ob");
         modelA.setInnerAttributeAa(objectInfo);
         ModelA modelA2 = new ModelA();
         {
             modelA2.setId(2L);
             ObjectInfo objectInfo2 = new ObjectInfo();
-            objectInfo2.setOa(new Object());
-            objectInfo2.setOb(new Object());
+            objectInfo2.setOa("oa1");
+            objectInfo2.setOb("ob1");
             modelA2.setInnerAttributeAa(objectInfo2);
             modelA2.setDependentModelA(null);
             modelA2.setModelBId(null);

@@ -1,6 +1,6 @@
 package com.github.case2.view;
 
-import com.github.case2.view.info.ObjectInfo;
+import com.github.case2.domain.modela.model.ObjectInfo;
 import lombok.Data;
 
 import java.util.List;
@@ -24,7 +24,7 @@ public class ViewA {
     /**
      * 外部-对象类型属性
      */
-    private Object outerAttributeAf;
+    private ObjectInfo outerAttributeAf;
 
     /**
      * 外部-对象类型集合

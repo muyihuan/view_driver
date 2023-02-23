@@ -2,6 +2,7 @@ package com.github.case2;
 
 import com.github.case2.domain.modela.ModelADomainService;
 import com.github.case2.domain.modela.model.ModelA;
+import com.github.case2.domain.modela.model.ObjectInfo;
 import com.github.case2.domain.modelb.ModelBDomainService;
 import com.github.case2.domain.modelb.model.ModelB;
 import com.github.case2.domain.modelc.ModelCDomainService;
@@ -13,7 +14,6 @@ import com.github.case2.domain.modele.model.ModelE;
 import com.github.case2.domain.modelf.ModelFDomainService;
 import com.github.case2.domain.modelf.model.ModelF;
 import com.github.case2.view.*;
-import com.github.case2.view.info.ObjectInfo;
 
 import java.util.ArrayList;
 import java.util.HashMap;

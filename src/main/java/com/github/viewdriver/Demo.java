@@ -1,5 +1,6 @@
 package com.github.viewdriver;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.case2.domain.modela.ModelADomainService;
 import com.github.case2.domain.modela.model.ModelA;
 import com.github.case2.domain.modelb.ModelBDomainService;
@@ -89,12 +90,14 @@ public class Demo {
         List<Long> ids = new ArrayList<>();
         ids.add(1L);
         List<ViewA> viewAList = defViewDriver.mapView(ids, ViewA.class, context);
+        System.out.println(new ObjectMapper().writeValueAsString(viewAList));
 
-        List<ModelB> modelBList = new ArrayList<>();
-        ModelB modelB = new ModelB();
-        modelB.setId(1L);
-        modelB.setInnerAttributeBa(new Object());
-        modelBList.add(modelB);
-        List<ViewB> viewBList = defViewDriver.mapView(modelBList, ViewB.class, context);
+//        List<ModelB> modelBList = new ArrayList<>();
+//        ModelB modelB = new ModelB();
+//        modelB.setId(1L);
+//        modelB.setInnerAttributeBa(new Object());
+//        modelBList.add(modelB);
+//        List<ViewB> viewBList = defViewDriver.mapView(modelBList, ViewB.class, context);
+//        System.out.println(new ObjectMapper().writeValueAsString(viewBList));
     }
 }
