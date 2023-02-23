@@ -36,11 +36,20 @@ public class ViewTree {
     }
 
     /**
+     * 视图树是否为空.
+     *
+     * @return true: 空、 false: 不为空.
+     */
+    public boolean isEmpty() {
+        return root_node == null;
+    }
+
+    /**
      * 获取视图树第几层的所有节点，跟节点为第一层.
      * @param dept 第几层.
      * @return 所有节点.
      */
-    public List<ViewTreeNode> getDeptNodes(int dept) {
+    List<ViewTreeNode> getDeptNodes(int dept) {
         if(dept <= 0) {
             return Collections.emptyList();
         }
@@ -75,15 +84,6 @@ public class ViewTree {
         }
 
         return new ArrayList<>(curr_dept_nodes);
-    }
-
-    /**
-     * 视图树是否为空.
-     *
-     * @return true: 空、 false: 不为空.
-     */
-    public boolean isEmpty() {
-        return root_node == null;
     }
 
     /**
