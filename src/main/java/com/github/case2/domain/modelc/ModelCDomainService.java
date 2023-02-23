@@ -13,6 +13,7 @@ import java.util.Map;
 public class ModelCDomainService {
 
     private static Map<Long, List<ModelC>> modelC_list_db = new HashMap<>();
+    private static Map<Long, ModelC> modelC_db = new HashMap<>();
     static {
         List<ModelC> modelCList = new ArrayList<>();
         ModelC modelC1 = new ModelC();
@@ -36,6 +37,22 @@ public class ModelCDomainService {
         modelC3.setSourceModelCId(null);
         modelCList.add(modelC3);
         modelC_list_db.put(1L, modelCList);
+
+        modelC_db.put(1L, modelC1);
+        modelC_db.put(2L, modelC2);
+        modelC_db.put(3L, modelC3);
+    }
+
+    public Map<Long, ModelC> batchGetModelCs(List<Long> ids) {
+        if(ids == null || ids.size() == 0) {
+            return null;
+        }
+
+        Map<Long, ModelC> modelMap = new HashMap<>();
+        ids.forEach(id -> {
+            modelMap.put(id, modelC_db.get(id));
+        });
+        return modelMap;
     }
 
     public Map<Long, List<ModelC>> queryModelCList(List<Long> ids, Integer page, Integer count) {
