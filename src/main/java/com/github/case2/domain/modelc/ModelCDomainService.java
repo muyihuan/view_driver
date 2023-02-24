@@ -31,7 +31,7 @@ public class ModelCDomainService {
         modelC3.setId(3L);
         modelC3.setModelAId(1L);
         modelC3.setModelBId(3L);
-        modelC3.setSourceModelCId(null);
+        modelC3.setSourceModelCId(1L);
         modelCList.add(modelC3);
         modelC_list_db.put(1L, modelCList);
         modelC_list_db.put(2L, Collections.singletonList(modelC2));

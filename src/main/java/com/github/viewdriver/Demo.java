@@ -35,6 +35,7 @@ public class Demo {
      * 全局视图驱动器
      */
     private static ViewDriver defViewDriver = null;
+    private static ObjectMapper objectMapper = new ObjectMapper();
 
     private static ModelADomainService modelADomainService = new ModelADomainService();
     private static ModelBDomainService modelBDomainService = new ModelBDomainService();
@@ -60,9 +61,11 @@ public class Demo {
                         .bind(ModelA::getId, ModelA.class)
                         .bind(ModelA::getModelBId, ModelB.class)
                         .bind(ModelA::getModelDIdList, ModelD.class)
-                        .bind(ModelA::getSourceModelAId, ModelA.class))
+                        .bind(ModelA::getSourceModelAId, ModelA.class)
+                        .bind(ModelA::getId, ModelE.class))
                 .modelIdBind(ModelB.class, new IdBinder<ModelB>()
-                        .bind(ModelB::getId, ModelB.class))
+                        .bind(ModelB::getId, ModelB.class)
+                        .bind(ModelB::getId, ModelF.class))
                 .modelIdBind(ModelC.class, new IdBinder<ModelC>()
                         .bind(ModelC::getId, ModelC.class)
                         .bind(ModelC::getModelAId, ModelA.class)
@@ -71,17 +74,17 @@ public class Demo {
                 .modelIdBind(ModelD.class, new IdBinder<ModelD>()
                         .bind(ModelD::getId, ModelD.class))
                 .modelIdBind(ModelE.class, new IdBinder<ModelE>()
-                        .bind(ModelE::getModelAId, ModelA.class))
+                        .bind(ModelE::getModelAId, ModelE.class))
                 .modelIdBind(ModelF.class, new IdBinder<ModelF>()
-                        .bind(ModelF::getModelBId, ModelB.class))
+                        .bind(ModelF::getModelBId, ModelF.class))
                 .modelLoaderById(ModelA.class, (ids, context) -> modelADomainService.batchGetModelAs(ids))
                 .modelLoaderById(ModelB.class, (ids, context) -> modelBDomainService.batchGetModelBs(ids))
                 .modelLoaderById(ModelC.class, (ids, context) -> modelCDomainService.batchGetModelCs(ids))
                 .modelLoaderById(ModelD.class, (ids, context) -> modelDDomainService.batchGetModelDs(ids))
+                .modelLoaderById(ModelE.class, (ids, context) -> modelEDomainService.batchGetModelEs(ids))
+                .modelLoaderById(ModelF.class, (ids, context) -> modelFDomainService.batchGetModelFs(ids))
                 .modelLoaderByOuterId(ModelC.class, ModelC::getModelAId, (ids, context) -> modelCDomainService.queryModelCList(ids, (Integer) context.get("page"), (Integer) context.get("count")))
                 .modelLoaderByOuterId(ModelC.class, ModelC::getModelAId, (ids, context) -> modelCDomainService.queryModelC2List(ids, (Integer) context.get("page"), (Integer) context.get("count")), ViewA::getViewC2List)
-                .modelLoaderByOuterId(ModelE.class, ModelE::getModelAId, (ids, context) -> modelEDomainService.batchGetModelEs(ids))
-                .modelLoaderByOuterId(ModelF.class, ModelF::getModelBId, (ids, context) -> modelFDomainService.batchGetModelFs(ids))
                 .nonModelLoader(ViewA::getOuterAttributeAf, ModelA::getId, (ids, context) -> modelADomainService.batchGetOuterObject(ids))
                 .filter(ModelA.class, (modelA, context) -> modelA != null)
                 .config(new Config())
@@ -101,13 +104,13 @@ public class Demo {
             List<ViewA> viewAList = defViewDriver.mapView(ids, ViewA.class, context);
             System.out.println("time cost = " + (System.nanoTime() - start) / 1000000.0 + "ms");
             System.out.println("ViewA视图 -> json");
-            System.out.println(new ObjectMapper().writeValueAsString(viewAList));
+            System.out.println(objectMapper.writeValueAsString(viewAList));
         }
 
         // 输入为model
         List<ModelA> modelAList = modelADomainService.batchGetModelAs(Arrays.asList(1L, 2L)).values().stream().collect(Collectors.toList());
         List<ViewA> viewAList = defViewDriver.mapView(modelAList, ViewA.class, context);
         System.out.println("ViewA视图 -> json");
-        System.out.println(new ObjectMapper().writeValueAsString(viewAList));
+        System.out.println(objectMapper.writeValueAsString(viewAList));
     }
 }
