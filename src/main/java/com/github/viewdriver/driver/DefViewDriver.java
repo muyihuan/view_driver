@@ -16,6 +16,8 @@ import com.github.viewdriver.lambda.FieldGetter;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -32,6 +34,7 @@ import java.util.stream.Collectors;
  */
 public class DefViewDriver implements ViewDriver {
 
+    private static final Logger logger = LoggerFactory.getLogger(ViewTreeParser.class);
     private final ViewDriverMetaData driverMeta;
     private final ViewTreeParser viewParser;
     private Config config;
@@ -614,37 +617,43 @@ public class DefViewDriver implements ViewDriver {
                 return methodProxy.invokeSuper(o, objects);
             }
 
-            int type = _child_node.getType();
-            if(type == 0 || type == 1) {
-                return child_view_map.get(method_name);
-            }
-            else if(type == 2) {
-                ViewDriverMetaData.ViewAndGetter viewAndGetter = new ViewDriverMetaData.ViewAndGetter(node.getNodeClass(), method_name);
-                FieldGetter _bind_getter = driver_meta.field_getter_bind.get(viewAndGetter);
-                if(_bind_getter != null) {
-                    Object _model_value = _bind_getter.apply(model);
-                    if(_model_value != null) {
-                        Function _decorator = driver_meta.field_decorator.get(viewAndGetter);
-                        if(_decorator != null) {
-                            return _decorator.apply(_model_value);
+            try {
+                int type = _child_node.getType();
+                if(type == 0 || type == 1) {
+                    return child_view_map.get(method_name);
+                }
+                else if(type == 2) {
+                    ViewDriverMetaData.ViewAndGetter viewAndGetter = new ViewDriverMetaData.ViewAndGetter(node.getNodeClass(), method_name);
+                    FieldGetter _bind_getter = driver_meta.field_getter_bind.get(viewAndGetter);
+                    if(_bind_getter != null) {
+                        Object _model_value = _bind_getter.apply(model);
+                        if(_model_value != null) {
+                            Function _decorator = driver_meta.field_decorator.get(viewAndGetter);
+                            if(_decorator != null) {
+                                return _decorator.apply(_model_value);
+                            }
+                            else {
+                                return _model_value;
+                            }
                         }
-                        else {
-                            return _model_value;
+                    }
+                    else {
+                        try {
+                            Method _model_getter = model.getClass().getMethod(method_name);
+                            if(_model_getter != null) {
+                                return _model_getter.invoke(model);
+                            }
+                        }
+                        catch (NoSuchMethodException ignore) {
+                            return methodProxy.invokeSuper(o, objects);
                         }
                     }
                 }
-                else {
-                    try {
-                        Method _model_getter = model.getClass().getMethod(method_name);
-                        if(_model_getter != null) {
-                            return _model_getter.invoke(model);
-                        }
-                    }
-                    catch (NoSuchMethodException ignore) {
-                        return methodProxy.invokeSuper(o, objects);
-                    }
-                }
             }
+            catch (Exception e) {
+                logger.error("代理方法执行失败 method_name = {}", method_name, e);
+            }
+
 
             return null;
         }

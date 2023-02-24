@@ -161,7 +161,7 @@ public class ViewDriverMetaData implements ModelAndView {
 
         view_bind_model.values().forEach(model -> {
             if(model_id_getter.get(model) == null) {
-                logger.info("元数据校验 => 注册的 model 没有设置加载器! model=" + model.getName());
+                logger.info("元数据校验 => 注册的 model 没有设置加载器! model={}", model.getName());
             }
         });
 

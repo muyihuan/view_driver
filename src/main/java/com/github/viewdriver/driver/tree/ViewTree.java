@@ -79,7 +79,7 @@ public class ViewTree {
 
             curr_dept++;
             if (curr_dept % 100 == 0) {
-                logger.info("请注意当前已进入视图树的第 " + curr_dept + "层");
+                logger.info("请注意当前已进入视图树的第 {} 层", curr_dept);
             }
         }
 
@@ -121,7 +121,7 @@ public class ViewTree {
                     views += "<" + nodes.get(i).getNodeClass().getSimpleName() + ">" + "  |  ";
                 }
             }
-            logger.debug("第" + curr_dept + "层 : " + views);
+            logger.debug("第{}层 : {}", curr_dept, views);
             curr_dept ++;
         }
         logger.debug("可视化视图树 end");

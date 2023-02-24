@@ -148,7 +148,7 @@ public class ViewTreeParser {
                                 child_relations.put(childNode, false);
                             }
                             else {
-                                logger.info("解析视图遇到无法处理情况，无法推算两者关系 父视图 = " + nodeClass.getName() + "，子视图 = " + componentType.getName());
+                                logger.info("解析视图遇到无法处理情况，无法推算两者关系 父视图={}，子视图={}", nodeClass.getName(), componentType.getName());
                             }
                         }
                         else {
@@ -158,7 +158,7 @@ public class ViewTreeParser {
                                 boolean outerIdGetterIsArray = outer_id_getter_return_type.isArray();
                                 boolean outerIdGetterIsCollection = Collection.class.isAssignableFrom(outer_id_getter_return_type);
                                 if(outerIdGetterIsArray || outerIdGetterIsCollection) {
-                                    logger.info("解析视图遇到无法处理情况，无法推算两者关系 父视图 = " + nodeClass.getName() + "，子视图 = " + componentType.getName());
+                                    logger.info("解析视图遇到无法处理情况，无法推算两者关系 父视图={}，子视图={}", nodeClass.getName(), componentType.getName());
                                 }
                                 else {
                                     ViewTreeNode childNode = generateViewTreeNode(componentType, _getter, 0, node, true, __right);
@@ -167,7 +167,7 @@ public class ViewTreeParser {
                                 }
                             }
                             else {
-                                logger.info("解析视图遇到无法处理情况，无法推算两者关系 父视图 = " + nodeClass.getName() + "，子视图 = " + componentType.getName());
+                                logger.info("解析视图遇到无法处理情况，无法推算两者关系 父视图={}，子视图={}", nodeClass.getName(), componentType.getName());
                             }
                         }
                     }
@@ -196,12 +196,12 @@ public class ViewTreeParser {
                 Type genericReturnType = _getter.getGenericReturnType();
                 if(genericReturnType != null) {
                     String typeName = genericReturnType.getTypeName();
-                    if(typeName != null && !"".equals(typeName)) {
+                    if(typeName != null && !"".equals(typeName) && typeName.contains("<") && typeName.contains(">")) {
                         typeName = typeName.substring(typeName.indexOf("<") + 1, typeName.indexOf(">"));
                         try {
                             elementType = Class.forName(typeName);
                         } catch (Exception e) {
-                            logger.error("Class.forName error typeName = " + typeName);
+                            logger.error("Class.forName error typeName={}", typeName);
                         }
                     }
                 }
@@ -237,7 +237,7 @@ public class ViewTreeParser {
                                 boolean outerIdGetterIsArray = outer_id_getter_return_type.isArray();
                                 boolean outerIdGetterIsCollection = Collection.class.isAssignableFrom(outer_id_getter_return_type);
                                 if(outerIdGetterIsArray || outerIdGetterIsCollection) {
-                                    logger.info("解析视图遇到无法处理情况，无法推算两者关系 父视图 = " + nodeClass.getName() + "，子视图 = " + elementType.getName());
+                                    logger.info("解析视图遇到无法处理情况，无法推算两者关系 父视图={}，子视图={}", nodeClass.getName(), elementType.getName());
                                 }
                                 else {
                                     ViewTreeNode childNode = generateViewTreeNode(elementType, _getter, 0, node, true, __right);
@@ -246,7 +246,7 @@ public class ViewTreeParser {
                                 }
                             }
                             else {
-                                logger.info("解析视图遇到无法处理情况，无法推算两者关系 父视图 = " + nodeClass.getName() + "，子视图 = " + elementType.getName());
+                                logger.info("解析视图遇到无法处理情况，无法推算两者关系 父视图={}，子视图={}", nodeClass.getName(), elementType.getName());
                             }
                         }
                     }

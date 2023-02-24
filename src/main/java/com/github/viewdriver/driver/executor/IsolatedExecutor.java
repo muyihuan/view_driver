@@ -39,7 +39,7 @@ public class IsolatedExecutor implements Executor {
         }
 
         if(logger.isDebugEnabled()) {
-            logger.debug("分组隔离执行器创建完成 groupCount=" + groupCount);
+            logger.debug("分组隔离执行器创建完成 groupCount={}", groupCount);
         }
     }
 
@@ -54,7 +54,7 @@ public class IsolatedExecutor implements Executor {
         threadPoolExecutorList.get(id).execute(task);
 
         if(logger.isDebugEnabled()) {
-            logger.debug("分组隔离执行器-任务执行完成 id=" + id);
+            logger.debug("分组隔离执行器-任务执行完成 id={}", id);
         }
     }
 }
