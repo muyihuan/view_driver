@@ -369,7 +369,7 @@ public class DefViewDriver implements ViewDriver {
         view_mapper.node = node;
         view_mapper.model = model;
         view_mapper.child_view_map = child_views;
-        view_mapper.driverMeta = driverMeta;
+        view_mapper.driver_meta = driverMeta;
         return view_mapper.map();
     }
 
@@ -588,7 +588,7 @@ public class DefViewDriver implements ViewDriver {
         private ViewTreeNode node;
         private Object model;
         private Map<String, Object> child_view_map;
-        private ViewDriverMetaData driverMeta;
+        private ViewDriverMetaData driver_meta;
 
         /**
          * 生成并获取渲染好的视图对象.
@@ -596,8 +596,8 @@ public class DefViewDriver implements ViewDriver {
          * @return 视图对象.
          */
         private Object map() {
-            if(node == null || model == null || driverMeta == null) {
-                throw new ParamIsNullException("node || model || driverMeta 不允许为空!");
+            if(node == null || model == null || driver_meta == null) {
+                throw new ParamIsNullException("node || model || driver_meta 不允许为空!");
             }
 
             Enhancer enhancer = new Enhancer();
@@ -620,11 +620,11 @@ public class DefViewDriver implements ViewDriver {
             }
             else if(type == 2) {
                 ViewDriverMetaData.ViewAndGetter viewAndGetter = new ViewDriverMetaData.ViewAndGetter(node.getNodeClass(), method_name);
-                FieldGetter _bind_getter = driverMeta.field_getter_bind.get(viewAndGetter);
+                FieldGetter _bind_getter = driver_meta.field_getter_bind.get(viewAndGetter);
                 if(_bind_getter != null) {
                     Object _model_value = _bind_getter.apply(model);
                     if(_model_value != null) {
-                        Function _decorator = driverMeta.field_decorator.get(viewAndGetter);
+                        Function _decorator = driver_meta.field_decorator.get(viewAndGetter);
                         if(_decorator != null) {
                             return _decorator.apply(_model_value);
                         }
