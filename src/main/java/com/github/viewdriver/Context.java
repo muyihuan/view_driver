@@ -1,5 +1,7 @@
 package com.github.viewdriver;
 
+import org.apache.commons.collections.MapUtils;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,7 +18,31 @@ public class Context {
         data.put(key, value);
     }
 
-    public Object get(String key) {
+    public String getString(String key) {
+        return MapUtils.getString(data, key);
+    }
+
+    public Integer getInteger(String key) {
+        return MapUtils.getInteger(data, key);
+    }
+
+    public Long getLong(String key) {
+        return MapUtils.getLong(data, key);
+    }
+
+    public Double getDouble(String key) {
+        return MapUtils.getDouble(data, key);
+    }
+
+    public Boolean getBoolean(String key) {
+        return MapUtils.getBoolean(data, key);
+    }
+
+    public Map getMap(String key) {
+        return MapUtils.getMap(data, key);
+    }
+
+    public Object getObject(String key) {
         return data.get(key);
     }
 }

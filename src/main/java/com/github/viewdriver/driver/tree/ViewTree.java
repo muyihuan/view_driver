@@ -94,14 +94,15 @@ public class ViewTree {
             return;
         }
 
-        if(root_node == null) {
-            logger.debug("********************空*********************");
-            return;
-        }
-
         logger.debug("start 可视化视图树 最大只展示到第10层 =>");
         logger.debug("-------------------=>");
         logger.debug("---------------------=>");
+
+        if(root_node == null) {
+            logger.debug("视图树为空!");
+            return;
+        }
+
         int curr_dept = 1;
         while(curr_dept <= 10) {
             List<ViewTreeNode> nodes = getDeptNodes(curr_dept);
