@@ -1,7 +1,8 @@
 package com.github.case2.domain.modela;
 
 import com.github.case2.domain.modela.model.ModelA;
-import com.github.case2.domain.modela.model.ObjectInfo;
+import com.github.case2.domain.modela.model.ObjectA;
+import com.github.case2.domain.modela.model.ObjectB;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -19,18 +20,21 @@ public class ModelADomainService {
     static {
         ModelA modelA = new ModelA();
         modelA.setId(1L);
-        ObjectInfo objectInfo = new ObjectInfo();
+        ObjectA objectInfo = new ObjectA();
         objectInfo.setOa("oa");
         objectInfo.setOb("ob");
         modelA.setInnerAttributeAa(objectInfo);
         modelA.setSourceModelAId(2L);
         modelA.setModelBId(1L);
         modelA.setModelDIdList(Arrays.asList(1L, 2L, 3L));
+        ObjectB objectB = new ObjectB();
+        objectB.setModelGId(1L);
+        modelA.setObjectB(objectB);
         modelA_db.put(1L, modelA);
 
         ModelA modelA2 = new ModelA();
         modelA2.setId(2L);
-        ObjectInfo objectInfo2 = new ObjectInfo();
+        ObjectA objectInfo2 = new ObjectA();
         objectInfo2.setOa("oa1");
         objectInfo2.setOb("ob1");
         modelA2.setInnerAttributeAa(objectInfo2);
@@ -52,13 +56,13 @@ public class ModelADomainService {
         return modelMap;
     }
 
-    public Map<Long, ObjectInfo> batchGetOuterObject(List<Long> ids) {
+    public Map<Long, ObjectA> batchGetOuterObject(List<Long> ids) {
         if(ids == null || ids.size() == 0) {
             return null;
         }
 
-        Map<Long, ObjectInfo> objectInfoMap = new HashMap<>();
-        ObjectInfo objectInfo = new ObjectInfo();
+        Map<Long, ObjectA> objectInfoMap = new HashMap<>();
+        ObjectA objectInfo = new ObjectA();
         objectInfo.setOa("outerOa");
         objectInfo.setOb("outerOb");
         objectInfoMap.put(1L, objectInfo);

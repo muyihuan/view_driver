@@ -2,7 +2,7 @@ package com.github.case2;
 
 import com.github.case2.domain.modela.ModelADomainService;
 import com.github.case2.domain.modela.model.ModelA;
-import com.github.case2.domain.modela.model.ObjectInfo;
+import com.github.case2.domain.modela.model.ObjectA;
 import com.github.case2.domain.modelb.ModelBDomainService;
 import com.github.case2.domain.modelb.model.ModelB;
 import com.github.case2.domain.modelc.ModelCDomainService;
@@ -90,7 +90,7 @@ public class Case {
             viewA.setViewAId(String.valueOf(modelA.getId()));
 
             // 构建内部attributeAa
-            ObjectInfo innerAttributeAa = new ObjectInfo();
+            ObjectA innerAttributeAa = new ObjectA();
             innerAttributeAa.setOa(modelA.getInnerAttributeAa().getOa());
             innerAttributeAa.setOb(modelA.getInnerAttributeAa().getOa());
             viewA.setInnerAttributeAa(innerAttributeAa);

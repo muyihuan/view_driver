@@ -8,7 +8,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class ObjectInfo {
+public class ObjectA {
 
     /**
      * 属性 oa

@@ -1,6 +1,6 @@
 package com.github.case2.view;
 
-import com.github.case2.domain.modela.model.ObjectInfo;
+import com.github.case2.domain.modela.model.ObjectA;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,12 +21,12 @@ public class ViewA {
     /**
      * 内部-基础属性
      */
-    private ObjectInfo innerAttributeAa;
+    private ObjectA innerAttributeAa;
 
     /**
      * 外部-对象类型属性
      */
-    private ObjectInfo outerAttributeAf;
+    private ObjectA outerAttributeAf;
 
     /**
      * 外部-对象类型集合
@@ -57,6 +57,11 @@ public class ViewA {
      * View集合 不是通过 View id 查的
      */
     private List<ViewC> viewC2List;
+
+    /**
+     * View类型 通过 View id 查的
+     */
+    private ViewG viewG;
 
     /**
      * 自己依赖自己类型

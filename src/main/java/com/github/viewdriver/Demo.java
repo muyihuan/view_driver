@@ -13,12 +13,16 @@ import com.github.case2.domain.modele.ModelEDomainService;
 import com.github.case2.domain.modele.model.ModelE;
 import com.github.case2.domain.modelf.ModelFDomainService;
 import com.github.case2.domain.modelf.model.ModelF;
+import com.github.case2.domain.modelg.ModelGDomainService;
+import com.github.case2.domain.modelg.model.ModelG;
 import com.github.case2.view.*;
 import com.github.viewdriver.builder.FieldBinder;
 import com.github.viewdriver.builder.IdBinder;
 import com.github.viewdriver.builder.ViewDriverBuilder;
 import com.github.viewdriver.driver.Config;
+import com.github.viewdriver.lambda.FieldGetter;
 
+import java.lang.invoke.SerializedLambda;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -43,6 +47,7 @@ public class Demo {
     private static ModelDDomainService modelDDomainService = new ModelDDomainService();
     private static ModelEDomainService modelEDomainService = new ModelEDomainService();
     private static ModelFDomainService modelFDomainService = new ModelFDomainService();
+    private static ModelGDomainService modelGDomainService = new ModelGDomainService();
 
     static {
         // 构建全局视图驱动器
@@ -57,12 +62,31 @@ public class Demo {
                         .bind(ViewD::getViewDId, ModelD::getId, String::valueOf))
                 .viewBindModel(ViewE.class, ModelE.class)
                 .viewBindModel(ViewF.class, ModelF.class)
+                .viewBindModel(ViewG.class, ModelG.class)
                 .modelIdBind(ModelA.class, new IdBinder<ModelA>()
                         .bind(ModelA::getId, ModelA.class)
                         .bind(ModelA::getModelBId, ModelB.class)
                         .bind(ModelA::getModelDIdList, ModelD.class)
                         .bind(ModelA::getSourceModelAId, ModelA.class)
-                        .bind(ModelA::getId, ModelE.class))
+                        .bind(ModelA::getId, ModelE.class)
+                        .bind(new FieldGetter<ModelA, Object>() {
+                            @Override
+                            public String getClassName() {
+                                return ModelA.class.getName();
+                            }
+                            @Override
+                            public String getMethodName() {
+                                return "getObjectB";
+                            }
+                            @Override
+                            public Object apply(ModelA modelA) {
+                                return modelA.getObjectB() == null ? null : modelA.getObjectB().getModelGId();
+                            }
+                            @Override
+                            public SerializedLambda getSerializedLambda() {
+                                return null;
+                            }
+                        }, ModelG.class))
                 .modelIdBind(ModelB.class, new IdBinder<ModelB>()
                         .bind(ModelB::getId, ModelB.class)
                         .bind(ModelB::getId, ModelF.class))
@@ -83,8 +107,9 @@ public class Demo {
                 .modelLoaderById(ModelD.class, (ids, context) -> modelDDomainService.batchGetModelDs(ids))
                 .modelLoaderById(ModelE.class, (ids, context) -> modelEDomainService.batchGetModelEs(ids))
                 .modelLoaderById(ModelF.class, (ids, context) -> modelFDomainService.batchGetModelFs(ids))
-                .modelLoaderByOuterId(ModelC.class, ModelC::getModelAId, (ids, context) -> modelCDomainService.queryModelCList(ids, (Integer) context.get("page"), (Integer) context.get("count")))
-                .modelLoaderByOuterId(ModelC.class, ModelC::getModelAId, (ids, context) -> modelCDomainService.queryModelC2List(ids, (Integer) context.get("page"), (Integer) context.get("count")), ViewA::getViewC2List)
+                .modelLoaderById(ModelG.class, (ids, context) -> modelGDomainService.batchGetModelGs(ids))
+                .modelLoaderByOuterId(ModelC.class, ModelC::getModelAId, (ids, context) -> modelCDomainService.queryModelCList(ids, context.getInteger("page"), context.getInteger("count")))
+                .modelLoaderByOuterId(ModelC.class, ModelC::getModelAId, (ids, context) -> modelCDomainService.queryModelC2List(ids, context.getInteger("page"), context.getInteger("count")), ViewA::getViewC2List)
                 .nonModelLoader(ViewA::getOuterAttributeAf, ModelA::getId, (ids, context) -> modelADomainService.batchGetOuterObject(ids))
                 .filter(ModelA.class, (modelA, context) -> modelA != null)
                 .config(new Config())

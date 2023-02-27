@@ -20,7 +20,7 @@ public class ModelA {
     /**
      * 基础属性 aa
      */
-    private ObjectInfo innerAttributeAa;
+    private ObjectA innerAttributeAa;
 
     /**
      * 有依赖关系的 ModelA
@@ -31,6 +31,11 @@ public class ModelA {
      * ModelB的ID
      */
     private Long modelBId;
+
+    /**
+     * ModelG的id在更深的层级
+     */
+    private ObjectB objectB;
 
     /**
      * ModelD的ID集合
