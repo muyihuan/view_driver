@@ -37,7 +37,7 @@ public class Demo {
     /**
      * 全局视图驱动器
      */
-    private static ViewDriver defViewDriver = null;
+    private static ViewDriver defViewDriver;
     private static ObjectMapper objectMapper = new ObjectMapper();
 
     private static ModelADomainService modelADomainService = new ModelADomainService();
