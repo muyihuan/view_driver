@@ -22,7 +22,6 @@ import com.github.viewdriver.builder.ViewDriverBuilder;
 import com.github.viewdriver.driver.Config;
 import com.github.viewdriver.lambda.FieldGetter;
 
-import java.lang.invoke.SerializedLambda;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -81,10 +80,6 @@ public class Demo {
                             @Override
                             public Object apply(ModelA modelA) {
                                 return modelA.getObjectB() == null ? null : modelA.getObjectB().getModelGId();
-                            }
-                            @Override
-                            public SerializedLambda getSerializedLambda() {
-                                return null;
                             }
                         }, ModelG.class))
                 .modelIdBind(ModelB.class, new IdBinder<ModelB>()
