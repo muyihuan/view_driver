@@ -15,8 +15,8 @@ public class ModelGDomainService {
     static {
         ModelG modelG = new ModelG();
         modelG.setId(1L);
-        modelG.setInnerAttributeGa("ga");
-        modelG.setInnerAttributeGb("gb");
+        modelG.setInnerAttributeGa("内部属性Ga-1");
+        modelG.setInnerAttributeGb("内部属性Gb-1");
 
         modelG_db.put(1L, modelG);
     }

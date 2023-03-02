@@ -15,15 +15,15 @@ public class ModelDDomainService {
     static {
         ModelD modelD1 = new ModelD();
         modelD1.setId(1L);
-        modelD1.setInnerAttributeDa("da1");
+        modelD1.setInnerAttributeDa("内部属性Da-1");
 
         ModelD modelD2 = new ModelD();
         modelD2.setId(2L);
-        modelD2.setInnerAttributeDa("da2");
+        modelD2.setInnerAttributeDa("内部属性Da-2");
 
         ModelD modelD3 = new ModelD();
         modelD3.setId(3L);
-        modelD3.setInnerAttributeDa("da3");
+        modelD3.setInnerAttributeDa("内部属性Da-3");
 
         modelD_db.put(1L, modelD1);
         modelD_db.put(2L, modelD2);

@@ -4,10 +4,7 @@ import com.github.case2.domain.modela.model.ModelA;
 import com.github.case2.domain.modela.model.ObjectA;
 import com.github.case2.domain.modela.model.ObjectB;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * modelA 领域.
@@ -21,8 +18,8 @@ public class ModelADomainService {
         ModelA modelA = new ModelA();
         modelA.setId(1L);
         ObjectA objectInfo = new ObjectA();
-        objectInfo.setOa("oa");
-        objectInfo.setOb("ob");
+        objectInfo.setOa("内部Object类型的Oa属性-1");
+        objectInfo.setOb("内部Object类型的Ob属性-1");
         modelA.setInnerAttributeAa(objectInfo);
         modelA.setSourceModelAId(2L);
         modelA.setModelBId(1L);
@@ -35,12 +32,12 @@ public class ModelADomainService {
         ModelA modelA2 = new ModelA();
         modelA2.setId(2L);
         ObjectA objectInfo2 = new ObjectA();
-        objectInfo2.setOa("oa1");
-        objectInfo2.setOb("ob1");
+        objectInfo2.setOa("内部Object类型的Oa属性-2");
+        objectInfo2.setOb("内部Object类型的Ob属性-2");
         modelA2.setInnerAttributeAa(objectInfo2);
         modelA2.setSourceModelAId(null);
         modelA2.setModelBId(null);
-        modelA2.setModelDIdList(Arrays.asList(2L));
+        modelA2.setModelDIdList(Collections.singletonList(2L));
         modelA_db.put(2L, modelA2);
     }
 
@@ -63,8 +60,8 @@ public class ModelADomainService {
 
         Map<Long, ObjectA> objectInfoMap = new HashMap<>();
         ObjectA objectInfo = new ObjectA();
-        objectInfo.setOa("outerOa");
-        objectInfo.setOb("outerOb");
+        objectInfo.setOa("外部属性Oa-1");
+        objectInfo.setOb("外部属性Ob-1");
         objectInfoMap.put(1L, objectInfo);
         return objectInfoMap;
     }

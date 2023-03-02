@@ -15,17 +15,17 @@ public class ModelBDomainService {
     static {
         ModelB modelB = new ModelB();
         modelB.setId(1L);
-        modelB.setInnerAttributeBa("ba1");
+        modelB.setInnerAttributeBa("内部属性Ba-1");
         modelB_db.put(1L, modelB);
 
         ModelB modelB2 = new ModelB();
         modelB2.setId(2L);
-        modelB2.setInnerAttributeBa("ba2");
+        modelB2.setInnerAttributeBa("内部属性Ba-2");
         modelB_db.put(2L, modelB2);
 
         ModelB modelB3 = new ModelB();
         modelB3.setId(3L);
-        modelB3.setInnerAttributeBa("ba3");
+        modelB3.setInnerAttributeBa("内部属性Ba-3");
         modelB_db.put(3L, modelB3);
     }
 
