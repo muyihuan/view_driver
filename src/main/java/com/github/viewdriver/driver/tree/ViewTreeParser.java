@@ -80,7 +80,6 @@ public class ViewTreeParser {
 
     /**
      * 构建视图树节点，通过注册的元数据进行推导.
-     * todo 支持继承关系.
      *
      * @param nodeClass 节点的Class类型.
      * @param type 节点类型.
