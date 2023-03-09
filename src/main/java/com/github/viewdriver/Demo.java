@@ -52,7 +52,7 @@ public class Demo {
         // 构建全局视图驱动器
         defViewDriver = new ViewDriverBuilder()
                 .viewBindModel(ViewA.class, ModelA.class, new FieldBinder<ViewA, ModelA>()
-                        .bind(ViewA::getViewAId, ModelA::getId, (r) -> "自定义转化、脱敏、加密等"))
+                        .bind(ViewA::getViewAId, ModelA::getId, (r) -> r + " 可被 -> 自定义转化、脱敏、加密等"))
                 .viewBindModel(ViewB.class, ModelB.class, new FieldBinder<ViewB, ModelB>()
                         .bind(ViewB::getViewBId, ModelB::getId, String::valueOf))
                 .viewBindModel(ViewC.class, ModelC.class, new FieldBinder<ViewC, ModelC>()
