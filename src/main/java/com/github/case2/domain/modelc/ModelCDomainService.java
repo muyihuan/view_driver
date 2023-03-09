@@ -36,9 +36,15 @@ public class ModelCDomainService {
         modelC_list_db.put(1L, modelCList);
         modelC_list_db.put(2L, Collections.singletonList(modelC2));
 
+        ModelC modelC4 = new ModelC();
+        modelC4.setId(4L);
+        modelC4.setModelAId(1L);
+        modelC4.setModelBId(2L);
+        modelC4.setSourceModelCId(1L);
         modelC_db.put(1L, modelC1);
         modelC_db.put(2L, modelC2);
         modelC_db.put(3L, modelC3);
+        modelC_db.put(4L, modelC4);
     }
 
     public Map<Long, ModelC> batchGetModelCs(List<Long> ids) {
@@ -68,12 +74,8 @@ public class ModelCDomainService {
     public Map<Long, List<ModelC>> queryModelC2List(List<Long> ids, Integer page, Integer count) {
         Map<Long, List<ModelC>> _modelC_list_db = new HashMap<>();
         List<ModelC> modelCList = new ArrayList<>();
-        ModelC modelC4 = new ModelC();
-        modelC4.setId(4L);
-        modelC4.setModelAId(1L);
-        modelC4.setModelBId(2L);
-        modelC4.setSourceModelCId(1L);
-        modelCList.add(modelC4);
+
+        modelCList.add(modelC_db.get(4L));
         _modelC_list_db.put(1L, modelCList);
         return _modelC_list_db;
     }

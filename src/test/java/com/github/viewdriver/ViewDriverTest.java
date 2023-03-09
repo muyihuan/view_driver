@@ -136,9 +136,12 @@ class ViewDriverTest {
         checkModelLoaderById(driverMetaData, ModelF.class, (ids, context) -> modelFDomainService.batchGetModelFs(ids), Collections.singletonList(1L));
         checkModelLoaderById(driverMetaData, ModelG.class, (ids, context) -> modelGDomainService.batchGetModelGs(ids), Collections.singletonList(1L));
 
-        defViewDriver.modelLoaderByOuterId(ModelC.class, ModelC::getModelAId, (ids, context) -> modelCDomainService.queryModelCList(ids, context.getInteger("page"), context.getInteger("count")))
+        defViewDriver
+                .modelLoaderByOuterId(ModelC.class, ModelC::getModelAId, (ids, context) -> modelCDomainService.queryModelCList(ids, context.getInteger("page"), context.getInteger("count")))
                 .modelLoaderByOuterId(ModelC.class, ModelC::getModelAId, (ids, context) -> modelCDomainService.queryModelC2List(ids, context.getInteger("page"), context.getInteger("count")), ViewA::getViewC2List);
-
+        // 校验
+        checkModelLoaderByOuterId(driverMetaData, ModelC.class, ModelC::getModelAId, (ids, context) -> modelCDomainService.queryModelCList(ids, context.getInteger("page"), context.getInteger("count")), null,  Collections.singletonList(1L));
+        checkModelLoaderByOuterId(driverMetaData, ModelC.class, ModelC::getModelAId, (ids, context) -> modelCDomainService.queryModelC2List(ids, context.getInteger("page"), context.getInteger("count")), "viewc2list",  Collections.singletonList(1L));
 
         System.out.println("元数据注册单元测试结束 <");
     }
@@ -240,5 +243,38 @@ class ViewDriverTest {
                 System.out.println("发现问题=> model_loader_by_id check not expect " + model.getSimpleName() + ".");
             }
         });
+    }
+
+    private <M, I> void checkModelLoaderByOuterId(ViewDriverMetaData driverMetaData, Class<M> model, FieldGetter<M, I> outerId, BiFunction<List<I>, Context, Map<I, List<M>>> expect, String bindViewAttribute, List<I> arguments) {
+        if(bindViewAttribute == null) {
+            ViewDriverMetaData.ModelAndGetter modelAndGetter = new ViewDriverMetaData.ModelAndGetter(model, outerId.getMethodName());
+            BiFunction<List<I>, Context, Map<I, List<M>>> loader = driverMetaData.model_loader_by_outer_id.get(modelAndGetter);
+            Map temp = new HashMap();
+            Map map1 = loader.apply(arguments, new Context());
+            map1 = map1 == null ? temp : map1;
+            Map map2 = expect.apply(arguments, new Context());
+            map2 = map2 == null ? temp : map2;
+            Map finalMap = map1;
+            map2.forEach((key, value) -> {
+                if(!finalMap.containsKey(key) || !finalMap.get(key).equals(value)) {
+                    System.out.println("发现问题=> model_loader_by_outer_id check not expect " + model.getSimpleName() + ".");
+                }
+            });
+        }
+        else {
+            ViewDriverMetaData.ModelAndGetterAndField modelAndGetterAndField = new ViewDriverMetaData.ModelAndGetterAndField(model, outerId.getMethodName(), bindViewAttribute);
+            BiFunction<List<I>, Context, Map<I, List<M>>> loader = driverMetaData.model_loader_by_outer_id_bind_field.get(modelAndGetterAndField);
+            Map temp = new HashMap();
+            Map map1 = loader.apply(arguments, new Context());
+            map1 = map1 == null ? temp : map1;
+            Map map2 = expect.apply(arguments, new Context());
+            map2 = map2 == null ? temp : map2;
+            Map finalMap = map1;
+            map2.forEach((key, value) -> {
+                if(!finalMap.containsKey(key) || !finalMap.get(key).equals(value)) {
+                    System.out.println("发现问题=> model_loader_by_outer_id_bind_field check not expect " + model.getSimpleName() + ".");
+                }
+            });
+        }
     }
 }
