@@ -18,7 +18,11 @@ import com.github.case2.view.*;
 import com.github.viewdriver.builder.FieldBinder;
 import com.github.viewdriver.builder.IdBinder;
 import com.github.viewdriver.builder.ViewDriverBuilder;
+import com.github.viewdriver.driver.Config;
+import com.github.viewdriver.driver.DefViewDriver;
 import com.github.viewdriver.driver.metadata.ViewDriverMetaData;
+import com.github.viewdriver.driver.tree.ViewTree;
+import com.github.viewdriver.driver.tree.ViewTreeParser;
 import com.github.viewdriver.lambda.FieldGetter;
 import org.junit.jupiter.api.Test;
 
@@ -37,8 +41,7 @@ import java.util.function.Function;
  */
 class ViewDriverTest {
 
-    private ViewDriverBuilder defViewDriver = new ViewDriverBuilder();
-
+    private static ViewDriverBuilder viewDriverBuilder = new ViewDriverBuilder();
     private static ModelADomainService modelADomainService = new ModelADomainService();
     private static ModelBDomainService modelBDomainService = new ModelBDomainService();
     private static ModelCDomainService modelCDomainService = new ModelCDomainService();
@@ -47,56 +50,35 @@ class ViewDriverTest {
     private static ModelFDomainService modelFDomainService = new ModelFDomainService();
     private static ModelGDomainService modelGDomainService = new ModelGDomainService();
 
-    @Test
-    void testMeta() throws Exception {
-        System.out.println("元数据注册单元测试开始 _");
-
-        Field driverMetaDataField = ViewDriverBuilder.class.getDeclaredField("driverMetaData");
-        driverMetaDataField.setAccessible(true);
-        ViewDriverMetaData driverMetaData = (ViewDriverMetaData) driverMetaDataField.get(defViewDriver);
-
-        defViewDriver
-                .viewBindModel(ViewA.class, ModelA.class, new FieldBinder<ViewA, ModelA>()
-                .bind(ViewA::getViewAId, ModelA::getId, (r) -> "自定义转化"))
-                .viewBindModel(ViewB.class, ModelB.class, new FieldBinder<ViewB, ModelB>()
-                        .bind(ViewB::getViewBId, ModelB::getId, String::valueOf))
-                .viewBindModel(ViewC.class, ModelC.class, new FieldBinder<ViewC, ModelC>()
-                        .bind(ViewC::getViewCId, ModelC::getId, String::valueOf))
-                .viewBindModel(ViewD.class, ModelD.class, new FieldBinder<ViewD, ModelD>()
-                        .bind(ViewD::getViewDId, ModelD::getId, String::valueOf))
+    static {
+        viewDriverBuilder
+                .viewBindModel(ViewA.class, ModelA.class, new FieldBinder<ViewA, ModelA>().bind(ViewA::getViewAId, ModelA::getId, (r) -> "自定义转化"))
+                .viewBindModel(ViewB.class, ModelB.class, new FieldBinder<ViewB, ModelB>().bind(ViewB::getViewBId, ModelB::getId, String::valueOf))
+                .viewBindModel(ViewC.class, ModelC.class, new FieldBinder<ViewC, ModelC>().bind(ViewC::getViewCId, ModelC::getId, String::valueOf))
+                .viewBindModel(ViewD.class, ModelD.class, new FieldBinder<ViewD, ModelD>().bind(ViewD::getViewDId, ModelD::getId, String::valueOf))
                 .viewBindModel(ViewE.class, ModelE.class)
                 .viewBindModel(ViewF.class, ModelF.class)
-                .viewBindModel(ViewG.class, ModelG.class);
-        // 校验
-        checkViewBindModel(driverMetaData, ViewA.class, ModelA.class, ViewA::getViewAId, ModelA::getId, (r) -> "自定义转化", 2L, "自定义转化");
-        checkViewBindModel(driverMetaData, ViewB.class, ModelB.class, ViewB::getViewBId, ModelB::getId, String::valueOf, 1L, "1");
-        checkViewBindModel(driverMetaData, ViewC.class, ModelC.class, ViewC::getViewCId, ModelC::getId, String::valueOf, 1L, "1");
-        checkViewBindModel(driverMetaData, ViewD.class, ModelD.class, ViewD::getViewDId, ModelD::getId, String::valueOf, 1L, "1");
-        checkViewBindModel(driverMetaData, ViewE.class, ModelE.class);
-        checkViewBindModel(driverMetaData, ViewF.class, ModelF.class);
-        checkViewBindModel(driverMetaData, ViewG.class, ModelG.class);
-
-        defViewDriver
+                .viewBindModel(ViewG.class, ModelG.class)
                 .modelIdBind(ModelA.class, new IdBinder<ModelA>()
-                .bind(ModelA::getId, ModelA.class)
-                .bind(ModelA::getModelBId, ModelB.class)
-                .bind(ModelA::getModelDIdList, ModelD.class)
-                .bind(ModelA::getSourceModelAId, ModelA.class)
-                .bind(ModelA::getId, ModelE.class)
-                .bind(new FieldGetter<ModelA, Object>() {
-                    @Override
-                    public String getClassName() {
-                        return ModelA.class.getName();
-                    }
-                    @Override
-                    public String getMethodName() {
-                        return "getObjectB";
-                    }
-                    @Override
-                    public Object apply(ModelA modelA) {
-                        return modelA.getObjectB() == null ? null : modelA.getObjectB().getModelGId();
-                    }
-                }, ModelG.class))
+                        .bind(ModelA::getId, ModelA.class)
+                        .bind(ModelA::getModelBId, ModelB.class)
+                        .bind(ModelA::getModelDIdList, ModelD.class)
+                        .bind(ModelA::getSourceModelAId, ModelA.class)
+                        .bind(ModelA::getId, ModelE.class)
+                        .bind(new FieldGetter<ModelA, Object>() {
+                            @Override
+                            public String getClassName() {
+                                return ModelA.class.getName();
+                            }
+                            @Override
+                            public String getMethodName() {
+                                return "getObjectB";
+                            }
+                            @Override
+                            public Object apply(ModelA modelA) {
+                                return modelA.getObjectB() == null ? null : modelA.getObjectB().getModelGId();
+                            }
+                        }, ModelG.class))
                 .modelIdBind(ModelB.class, new IdBinder<ModelB>()
                         .bind(ModelB::getId, ModelB.class)
                         .bind(ModelB::getId, ModelF.class))
@@ -110,24 +92,42 @@ class ViewDriverTest {
                 .modelIdBind(ModelE.class, new IdBinder<ModelE>()
                         .bind(ModelE::getModelAId, ModelE.class))
                 .modelIdBind(ModelF.class, new IdBinder<ModelF>()
-                        .bind(ModelF::getModelBId, ModelF.class));
-        // 校验
-        checkModelIdBind(driverMetaData, ModelA.class,  true, ModelB.class, "getModelBId", ModelD.class, "getModelDIdList", ModelA.class, "getSourceModelAId", ModelE.class, "getId", ModelG.class, "getObjectB");
-        checkModelIdBind(driverMetaData, ModelB.class,  true, ModelF.class, "getId");
-        checkModelIdBind(driverMetaData, ModelC.class,  true, ModelA.class, "getModelAId", ModelB.class, "getModelBId", ModelC.class, "getSourceModelCId");
-        checkModelIdBind(driverMetaData, ModelD.class,  true);
-        checkModelIdBind(driverMetaData, ModelE.class,  true);
-        checkModelIdBind(driverMetaData, ModelF.class,  true);
-
-        defViewDriver
+                        .bind(ModelF::getModelBId, ModelF.class))
                 .modelLoaderById(ModelA.class, (ids, context) -> modelADomainService.batchGetModelAs(ids))
                 .modelLoaderById(ModelB.class, (ids, context) -> modelBDomainService.batchGetModelBs(ids))
                 .modelLoaderById(ModelC.class, (ids, context) -> modelCDomainService.batchGetModelCs(ids))
                 .modelLoaderById(ModelD.class, (ids, context) -> modelDDomainService.batchGetModelDs(ids))
                 .modelLoaderById(ModelE.class, (ids, context) -> modelEDomainService.batchGetModelEs(ids))
                 .modelLoaderById(ModelF.class, (ids, context) -> modelFDomainService.batchGetModelFs(ids))
-                .modelLoaderById(ModelG.class, (ids, context) -> modelGDomainService.batchGetModelGs(ids));
-        // 校验
+                .modelLoaderById(ModelG.class, (ids, context) -> modelGDomainService.batchGetModelGs(ids))
+                .modelLoaderByOuterId(ModelC.class, ModelC::getModelAId, (ids, context) -> modelCDomainService.queryModelCList(ids, context.getInteger("page"), context.getInteger("count")))
+                .modelLoaderByOuterId(ModelC.class, ModelC::getModelAId, (ids, context) -> modelCDomainService.queryModelC2List(ids, context.getInteger("page"), context.getInteger("count")), ViewA::getViewC2List)
+                .nonModelLoader(ViewA::getOuterAttributeAf, ModelA::getId, (ids, context) -> modelADomainService.batchGetOuterObject(ids))
+                .filter(ModelA.class, (modelA, context) -> modelA != null)
+                .config(new Config());
+    }
+
+    @Test
+    void testMeta() throws Exception {
+        System.out.println("元数据注册单元测试开始 _");
+
+        Field driverMetaDataField = ViewDriverBuilder.class.getDeclaredField("driverMetaData");
+        driverMetaDataField.setAccessible(true);
+        ViewDriverMetaData driverMetaData = (ViewDriverMetaData) driverMetaDataField.get(viewDriverBuilder);
+
+        checkViewBindModel(driverMetaData, ViewA.class, ModelA.class, ViewA::getViewAId, ModelA::getId, (r) -> "自定义转化", 2L, "自定义转化");
+        checkViewBindModel(driverMetaData, ViewB.class, ModelB.class, ViewB::getViewBId, ModelB::getId, String::valueOf, 1L, "1");
+        checkViewBindModel(driverMetaData, ViewC.class, ModelC.class, ViewC::getViewCId, ModelC::getId, String::valueOf, 1L, "1");
+        checkViewBindModel(driverMetaData, ViewD.class, ModelD.class, ViewD::getViewDId, ModelD::getId, String::valueOf, 1L, "1");
+        checkViewBindModel(driverMetaData, ViewE.class, ModelE.class);
+        checkViewBindModel(driverMetaData, ViewF.class, ModelF.class);
+        checkViewBindModel(driverMetaData, ViewG.class, ModelG.class);
+        checkModelIdBind(driverMetaData, ModelA.class,  true, ModelB.class, "getModelBId", ModelD.class, "getModelDIdList", ModelA.class, "getSourceModelAId", ModelE.class, "getId", ModelG.class, "getObjectB");
+        checkModelIdBind(driverMetaData, ModelB.class,  true, ModelF.class, "getId");
+        checkModelIdBind(driverMetaData, ModelC.class,  true, ModelA.class, "getModelAId", ModelB.class, "getModelBId", ModelC.class, "getSourceModelCId");
+        checkModelIdBind(driverMetaData, ModelD.class,  true);
+        checkModelIdBind(driverMetaData, ModelE.class,  true);
+        checkModelIdBind(driverMetaData, ModelF.class,  true);
         checkModelLoaderById(driverMetaData, ModelA.class, (ids, context) -> modelADomainService.batchGetModelAs(ids), Collections.singletonList(1L));
         checkModelLoaderById(driverMetaData, ModelB.class, (ids, context) -> modelBDomainService.batchGetModelBs(ids), Collections.singletonList(1L));
         checkModelLoaderById(driverMetaData, ModelC.class, (ids, context) -> modelCDomainService.batchGetModelCs(ids), Collections.singletonList(1L));
@@ -135,29 +135,37 @@ class ViewDriverTest {
         checkModelLoaderById(driverMetaData, ModelE.class, (ids, context) -> modelEDomainService.batchGetModelEs(ids), Collections.singletonList(1L));
         checkModelLoaderById(driverMetaData, ModelF.class, (ids, context) -> modelFDomainService.batchGetModelFs(ids), Collections.singletonList(1L));
         checkModelLoaderById(driverMetaData, ModelG.class, (ids, context) -> modelGDomainService.batchGetModelGs(ids), Collections.singletonList(1L));
-
-        defViewDriver
-                .modelLoaderByOuterId(ModelC.class, ModelC::getModelAId, (ids, context) -> modelCDomainService.queryModelCList(ids, context.getInteger("page"), context.getInteger("count")))
-                .modelLoaderByOuterId(ModelC.class, ModelC::getModelAId, (ids, context) -> modelCDomainService.queryModelC2List(ids, context.getInteger("page"), context.getInteger("count")), ViewA::getViewC2List);
-        // 校验
         checkModelLoaderByOuterId(driverMetaData, ModelC.class, ModelC::getModelAId, (ids, context) -> modelCDomainService.queryModelCList(ids, context.getInteger("page"), context.getInteger("count")), null, Collections.singletonList(1L));
         checkModelLoaderByOuterId(driverMetaData, ModelC.class, ModelC::getModelAId, (ids, context) -> modelCDomainService.queryModelC2List(ids, context.getInteger("page"), context.getInteger("count")), "ViewC2List".toLowerCase(), Collections.singletonList(1L));
-
-        defViewDriver
-                .nonModelLoader(ViewA::getOuterAttributeAf, ModelA::getId, (ids, context) -> modelADomainService.batchGetOuterObject(ids));
         checkNonModelLoader(driverMetaData, ViewA.class, ViewA::getOuterAttributeAf, ModelA::getId, (ids, context) -> modelADomainService.batchGetOuterObject(ids), Collections.singletonList(1L));
 
         System.out.println("元数据注册单元测试结束 <");
     }
 
     @Test
-    void testViewTree() {
+    void testViewTree() throws Exception {
+        Field driverMetaDataField = ViewDriverBuilder.class.getDeclaredField("driverMetaData");
+        driverMetaDataField.setAccessible(true);
+        ViewDriverMetaData driverMetaData = (ViewDriverMetaData) driverMetaDataField.get(viewDriverBuilder);
+
+        ViewTreeParser viewTreeParser = new ViewTreeParser(driverMetaData);
+        ViewTree viewATree = viewTreeParser.generateViewTree(ViewA.class);
+        ViewTree viewBTree = viewTreeParser.generateViewTree(ViewB.class);
+        ViewTree viewCTree = viewTreeParser.generateViewTree(ViewC.class);
+        ViewTree viewDTree = viewTreeParser.generateViewTree(ViewD.class);
+        ViewTree viewETree = viewTreeParser.generateViewTree(ViewE.class);
+        ViewTree viewFTree = viewTreeParser.generateViewTree(ViewF.class);
+        ViewTree viewGTree = viewTreeParser.generateViewTree(ViewG.class);
 
     }
 
     @Test
-    void testLoadModel() {
+    void testLoadModel() throws Exception {
+        Field driverMetaDataField = ViewDriverBuilder.class.getDeclaredField("driverMetaData");
+        driverMetaDataField.setAccessible(true);
+        ViewDriverMetaData driverMetaData = (ViewDriverMetaData) driverMetaDataField.get(viewDriverBuilder);
 
+        DefViewDriver viewDriver = new DefViewDriver(driverMetaData, new Config());
     }
 
     @Test
@@ -275,6 +283,7 @@ class ViewDriverTest {
             });
         }
         else {
+            bindViewAttribute = bindViewAttribute.toLowerCase();
             ViewDriverMetaData.ModelAndGetterAndField modelAndGetterAndField = new ViewDriverMetaData.ModelAndGetterAndField(model, outerId.getMethodName(), bindViewAttribute);
             BiFunction<List<I>, Context, Map<I, List<M>>> loader = driverMetaData.model_loader_by_outer_id_bind_field.get(modelAndGetterAndField);
             Map temp = new HashMap();
