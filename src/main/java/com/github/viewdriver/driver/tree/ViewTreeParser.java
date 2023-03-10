@@ -67,13 +67,10 @@ public class ViewTreeParser {
         }
 
         viewTree = new ViewTree();
-
         viewTree.root_node = generateViewTreeNode(rootView, null,  0, null, false, new ConcurrentHashMap<>());
-
-        view_tree_cache.put(rootView, viewTree);
-
         viewTree.draw_it();
 
+        view_tree_cache.put(rootView, viewTree);
         return viewTree;
     }
 
