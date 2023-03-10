@@ -68,8 +68,7 @@ public class ViewTreeParser {
 
         viewTree = new ViewTree();
 
-        Map<Class, ViewTreeNode> right = new HashMap<>();
-        viewTree.root_node = generateViewTreeNode(rootView, null,  0, null, false, right);
+        viewTree.root_node = generateViewTreeNode(rootView, null,  0, null, false, new ConcurrentHashMap<>());
 
         view_tree_cache.put(rootView, viewTree);
 
