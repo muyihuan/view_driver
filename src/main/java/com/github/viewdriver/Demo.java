@@ -128,7 +128,7 @@ public class Demo {
         }
 
         // 输入为model.
-        List<ModelA> modelAList = modelADomainService.batchGetModelAs(Arrays.asList(1L, 2L)).values().stream().collect(Collectors.toList());
+        List<ModelA> modelAList = new ArrayList<>(modelADomainService.batchGetModelAs(Arrays.asList(1L, 2L)).values());
         List<ViewA> viewAList = defViewDriver.mapView(modelAList, ViewA.class, context);
         System.out.println("ViewA视图 -> json");
         System.out.println(objectMapper.writeValueAsString(viewAList));
