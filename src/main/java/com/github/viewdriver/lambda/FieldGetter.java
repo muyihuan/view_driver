@@ -16,6 +16,7 @@ public interface FieldGetter<T, R> extends Function<T, R>, Serializable {
 
     /**
      * 获取getter对应的类名称.
+     *
      * @return 类的全路径.
      */
     @SneakyThrows
@@ -25,6 +26,7 @@ public interface FieldGetter<T, R> extends Function<T, R>, Serializable {
 
     /**
      * 获取getter对应的方法名称.
+     *
      * @return 方法名称.
      */
     @SneakyThrows
@@ -34,6 +36,7 @@ public interface FieldGetter<T, R> extends Function<T, R>, Serializable {
 
     /**
      * 获取getter返回值类型.
+     *
      * @return 方法名称.
      */
     @SneakyThrows
@@ -43,6 +46,7 @@ public interface FieldGetter<T, R> extends Function<T, R>, Serializable {
 
     /**
      * 获取getter对应的属性名称.
+     *
      * @return 属性名称.
      */
     @SneakyThrows
@@ -61,6 +65,7 @@ public interface FieldGetter<T, R> extends Function<T, R>, Serializable {
 
     /**
      * 获取lambda表达式的元信息.
+     *
      * @return 表达式的相关信息.
      */
     @SneakyThrows

@@ -108,15 +108,15 @@ public class DefViewDriver implements ViewDriver {
 
         ViewTreeNode root_node = viewTree.getRoot();
 
-        // model加载
+        // model加载.
         long timeout = config.driverConfig.getTimeout();
         ModelHouse model_house = new ModelHouse();
         load_mode(root_node, null, true, inputDataList, context, model_house);
 
-        // 临时存在
+        // 临时存在.
         Thread.sleep(timeout);
 
-        // view渲染
+        // view渲染.
         List<V> views = model_house.getRootModelList().stream()
                 .filter(Objects::nonNull)
                 .map(model -> (V) view_mapper(root_node, model, model_house)).collect(Collectors.toList());
@@ -126,7 +126,7 @@ public class DefViewDriver implements ViewDriver {
 
     /**
      * model 加载.
-     * todo 研究java线程是怎么玩的.
+     * todo 研究java线程.
      *
      * @param node 节点.
      * @param is_root 是否是根节点.

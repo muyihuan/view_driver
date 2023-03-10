@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 public class Demo {
 
     /**
-     * 全局视图驱动器
+     * 全局视图驱动器.
      */
     private static ViewDriver defViewDriver;
     private static ObjectMapper objectMapper = new ObjectMapper();
@@ -49,7 +49,7 @@ public class Demo {
     private static ModelGDomainService modelGDomainService = new ModelGDomainService();
 
     static {
-        // 构建全局视图驱动器
+        // 构建全局视图驱动器.
         defViewDriver = new ViewDriverBuilder()
                 .viewBindModel(ViewA.class, ModelA.class, new FieldBinder<ViewA, ModelA>()
                         .bind(ViewA::getViewAId, ModelA::getId, (r) -> r + " 可被 -> 自定义转化、脱敏、加密等"))
@@ -114,7 +114,7 @@ public class Demo {
     public static void main(String[] args) throws Exception {
         Context context = new Context();
 
-        // 输入为id
+        // 输入为id.
         List<Long> ids = new ArrayList<>();
         ids.add(1L);
         ids.add(2L);
@@ -127,7 +127,7 @@ public class Demo {
             System.out.println(objectMapper.writeValueAsString(viewAList));
         }
 
-        // 输入为model
+        // 输入为model.
         List<ModelA> modelAList = modelADomainService.batchGetModelAs(Arrays.asList(1L, 2L)).values().stream().collect(Collectors.toList());
         List<ViewA> viewAList = defViewDriver.mapView(modelAList, ViewA.class, context);
         System.out.println("ViewA视图 -> json");
