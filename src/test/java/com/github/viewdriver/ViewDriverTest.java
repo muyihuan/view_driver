@@ -140,8 +140,12 @@ class ViewDriverTest {
                 .modelLoaderByOuterId(ModelC.class, ModelC::getModelAId, (ids, context) -> modelCDomainService.queryModelCList(ids, context.getInteger("page"), context.getInteger("count")))
                 .modelLoaderByOuterId(ModelC.class, ModelC::getModelAId, (ids, context) -> modelCDomainService.queryModelC2List(ids, context.getInteger("page"), context.getInteger("count")), ViewA::getViewC2List);
         // 校验
-        checkModelLoaderByOuterId(driverMetaData, ModelC.class, ModelC::getModelAId, (ids, context) -> modelCDomainService.queryModelCList(ids, context.getInteger("page"), context.getInteger("count")), null,  Collections.singletonList(1L));
-        checkModelLoaderByOuterId(driverMetaData, ModelC.class, ModelC::getModelAId, (ids, context) -> modelCDomainService.queryModelC2List(ids, context.getInteger("page"), context.getInteger("count")), "viewc2list",  Collections.singletonList(1L));
+        checkModelLoaderByOuterId(driverMetaData, ModelC.class, ModelC::getModelAId, (ids, context) -> modelCDomainService.queryModelCList(ids, context.getInteger("page"), context.getInteger("count")), null, Collections.singletonList(1L));
+        checkModelLoaderByOuterId(driverMetaData, ModelC.class, ModelC::getModelAId, (ids, context) -> modelCDomainService.queryModelC2List(ids, context.getInteger("page"), context.getInteger("count")), "ViewC2List".toLowerCase(), Collections.singletonList(1L));
+
+        defViewDriver
+                .nonModelLoader(ViewA::getOuterAttributeAf, ModelA::getId, (ids, context) -> modelADomainService.batchGetOuterObject(ids));
+        checkNonModelLoader(driverMetaData, ViewA.class, ViewA::getOuterAttributeAf, ModelA::getId, (ids, context) -> modelADomainService.batchGetOuterObject(ids), Collections.singletonList(1L));
 
         System.out.println("元数据注册单元测试结束 <");
     }
@@ -160,6 +164,15 @@ class ViewDriverTest {
     void testMapView() {
 
     }
+
+
+
+
+
+
+
+
+
 
     private <V, M, O, I> void checkViewBindModel(ViewDriverMetaData driverMetaData, Class<V> view, Class<M> model, FieldGetter<V, O> viewFieldGetter, FieldGetter<M, I> modelFieldGetter, Function<I, O> decorator, I argument, I expect) {
         Class modelClass = driverMetaData.view_bind_model.get(view);
@@ -276,5 +289,36 @@ class ViewDriverTest {
                 }
             });
         }
+    }
+
+    private <V, M, A, I> void checkNonModelLoader(ViewDriverMetaData driverMetaData, Class<V> view, FieldGetter<V, A> viewAttribute, FieldGetter<M, I> idGetter, BiFunction<List<I>, Context, Map<I, A>> expect, List<I> arguments) {
+        ViewDriverMetaData.ViewAndGetter viewAndGetter = new ViewDriverMetaData.ViewAndGetter(view, viewAttribute.getMethodName());
+        FieldGetter fieldGetter = driverMetaData.non_model_id_getter.get(viewAndGetter);
+        if(fieldGetter == null) {
+            System.out.println("发现问题=> non_model_id_getter check fail " + view.getSimpleName() + "::" + viewAttribute.getMethodName() + ".");
+            return;
+        }
+        else {
+            if(!fieldGetter.getClassName().equals(idGetter.getClassName()) || !fieldGetter.getMethodName().equals(idGetter.getMethodName())) {
+                System.out.println("发现问题=> non_model_id_getter check not expect " + view.getSimpleName() + "::" + viewAttribute.getMethodName() + ".");
+            }
+        }
+
+        BiFunction<List<I>, Context, Map<I, A>> loader = driverMetaData.non_model_loader.get(viewAndGetter);
+        if(loader == null) {
+            System.out.println("发现问题=> non_model_loader check fail loader is null " + view.getSimpleName() + "::" + viewAttribute.getMethodName() + ".");
+        }
+
+        Map temp = new HashMap();
+        Map map1 = loader.apply(arguments, new Context());
+        map1 = map1 == null ? temp : map1;
+        Map map2 = expect.apply(arguments, new Context());
+        map2 = map2 == null ? temp : map2;
+        Map finalMap = map1;
+        map2.forEach((key, value) -> {
+            if(!finalMap.containsKey(key) || !finalMap.get(key).equals(value)) {
+                System.out.println("发现问题=> non_model_loader check not expect " + view.getSimpleName() + "::" + viewAttribute.getMethodName() + ".");
+            }
+        });
     }
 }

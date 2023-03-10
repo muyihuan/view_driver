@@ -19,4 +19,13 @@ public class ObjectA {
      * 属性 ob
      */
     private String ob;
+
+    public boolean equals(Object obj) {
+       if(!(obj instanceof ObjectA)) {
+           return false;
+       }
+
+        ObjectA objectA = ((ObjectA) obj);
+       return objectA.oa.equals(this.oa) && objectA.ob.equals(this.ob);
+    }
 }
