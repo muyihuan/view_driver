@@ -1,6 +1,6 @@
 # 视图驱动器
 
-文档：https://l4h83azj7r.feishu.cn/docx/KakjdwqxxoKjfixu8YgcHNiOnIt
+设计文档：https://l4h83azj7r.feishu.cn/docx/KakjdwqxxoKjfixu8YgcHNiOnIt
 
 ## 一、目标
 构建一个通用的View库/工具。
@@ -12,10 +12,10 @@
   6. 学习和使用成本低。
   
 ## 二、边界
-  包含：
+包含：
     1. 提供构建View驱动器的接口。
     2. 通过输入的View驱动加载数据，并进行View的构建、渲染。
-  不包含：
+不包含：
     1. 定义View的内容和View的维护。
     2. 定义加载哪些Model数据以及Model加载的具体实现。
     3. 定义View渲染的具体实现。
