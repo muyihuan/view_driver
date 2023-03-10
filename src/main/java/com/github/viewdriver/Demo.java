@@ -25,7 +25,6 @@ import com.github.views.view.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 使用示例.
