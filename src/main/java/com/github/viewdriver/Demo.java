@@ -31,6 +31,7 @@ import java.util.List;
  *
  * @author yanghuan
  */
+@SuppressWarnings("all")
 public class Demo {
 
     /**
