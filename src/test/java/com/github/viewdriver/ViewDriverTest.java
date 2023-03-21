@@ -39,6 +39,7 @@ import java.util.function.Function;
  *
  * @author yanghuan
  */
+@SuppressWarnings("all")
 class ViewDriverTest {
 
     private static ViewDriverBuilder viewDriverBuilder = new ViewDriverBuilder();
