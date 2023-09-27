@@ -107,6 +107,6 @@ public class Config {
         /**
          * view数据加载和渲染的超时时间(ms).
          */
-        private long timeout;
+        private long timeout = 1000;
     }
 }

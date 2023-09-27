@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.concurrent.Executor;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -39,6 +39,7 @@ public class DefViewDriver implements ViewDriver {
     private final ViewTreeParser viewParser;
     private Config config;
     private Executor executor;
+    private Executor future_wait_executor;
 
     /**
      * Create a new instance.
@@ -58,7 +59,7 @@ public class DefViewDriver implements ViewDriver {
      * @param executor 任务执行器.
      * @param viewTreeParser 视图解析器.
      */
-    public DefViewDriver(ViewDriverMetaData driverMeta, Config config, Executor executor, ViewTreeParser viewTreeParser) {
+    private DefViewDriver(ViewDriverMetaData driverMeta, Config config, Executor executor, ViewTreeParser viewTreeParser) {
         this.driverMeta = driverMeta;
         this.config = config;
         this.executor = executor;
@@ -85,6 +86,15 @@ public class DefViewDriver implements ViewDriver {
                 this.executor = new IsolatedExecutor("view-driver-executor", this.config.executorConfig);
             }
         }
+
+        this.future_wait_executor = new ThreadPoolExecutor(
+                10,
+                50,
+                5,
+                TimeUnit.MINUTES,
+                new LinkedBlockingQueue<>(1000),
+                r -> new Thread(r, "vd-future-executor"),
+                new ThreadPoolExecutor.DiscardPolicy());
     }
 
     @Override
@@ -109,12 +119,8 @@ public class DefViewDriver implements ViewDriver {
         ViewTreeNode root_node = viewTree.getRoot();
 
         // model加载.
-        long timeout = config.driverConfig.getTimeout();
         ModelHouse model_house = new ModelHouse();
         load_mode(root_node, null, true, inputDataList, context, model_house);
-
-        // 临时存在.
-        Thread.sleep(timeout);
 
         // view渲染.
         List<V> views = model_house.getRootModelList().stream()
@@ -126,13 +132,12 @@ public class DefViewDriver implements ViewDriver {
 
     /**
      * model 加载.
-     * todo 研究java线程.
      *
      * @param node 节点.
      * @param is_root 是否是根节点.
      * @param inputDataList 输入数据.
      */
-    private void load_mode(ViewTreeNode node, ViewTreeNode parent_node, boolean is_root, List inputDataList, Context context, ModelHouse model_house) {
+    private CompletableFuture<Void> load_mode(ViewTreeNode node, ViewTreeNode parent_node, boolean is_root, List inputDataList, Context context, ModelHouse model_house) {
         AtomicBoolean is_need_load_child = new AtomicBoolean(false);
         if(is_root) {
             is_need_load_child.set(true);
@@ -261,15 +266,46 @@ public class DefViewDriver implements ViewDriver {
             }
         }
 
+        long timeout = config.driverConfig.getTimeout();
+        List<CompletableFuture> child_futures = new ArrayList<>();
         if(is_need_load_child.get()) {
             List<ViewTreeNode> nodes = node.getChildNodes();
             if(nodes != null && nodes.size() > 0) {
                 for(ViewTreeNode _node : nodes) {
-//                    executor.execute(() -> load_mode(_node, node, false, inputDataList, context, model_house));
-                    load_mode(_node, node, false, inputDataList, context, model_house);
+                    CompletableFuture<Void> c_future = new CompletableFuture<>();
+                    executor.execute(() -> {
+                        try {
+                            CompletableFuture<Void> c_c_future = load_mode(_node, node, false, inputDataList, context, model_house);
+                            if(c_c_future != null) {
+                                c_c_future.thenAcceptAsync(c_future::complete, future_wait_executor);
+                            }
+                            else {
+                                c_future.complete(null);
+                            }
+                        }
+                        catch (Exception e) {
+                            logger.info("加载数据失败 node_name = {}", _node.getNodeClass(), e);
+                            c_future.complete(null);
+                        }
+                    });
+                    child_futures.add(c_future);
+                }
+
+                if(is_root) {
+                    try {
+                        CompletableFuture.allOf(child_futures.toArray(new CompletableFuture[0])).get(timeout, TimeUnit.MILLISECONDS);
+                    }
+                    catch (Exception e) {
+                        logger.info("加载数据超时 root_view = {}", node.getNodeClass(), e);
+                    }
+                }
+                else {
+                    return CompletableFuture.allOf(child_futures.toArray(new CompletableFuture[0]));
                 }
             }
         }
+
+        return null;
     }
 
     /**

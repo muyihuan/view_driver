@@ -119,7 +119,7 @@ public class Demo {
         ids.add(1L);
         ids.add(2L);
         ids.add(3L);
-        for(int i = 0; i < 1; i ++) {
+        for(int i = 0; i < 100; i ++) {
             long start = System.nanoTime();
             List<ViewA> viewAList = defViewDriver.mapView(ids, ViewA.class, context);
             System.out.println("time cost = " + (System.nanoTime() - start) / 1000000.0 + "ms");
